@@ -1,0 +1,103 @@
+# Copyright (c) 2013-2014, ARM Limited
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE
+
+# Patch FORTRAN test bench array sizes.
+#
+# We currently need this as the OpenCL code writes past its buffers because it
+# does not know the size of the array.
+#
+# To apply, use:
+#
+#   patch -p3 < thisfile
+#
+diff --git a/testsuite/blastest/testfiles/cblat1.f b/testsuite/blastest/testfiles/cblat1.f
+index a4c996f..9329205 100644
+--- a/testsuite/blastest/testfiles/cblat1.f
++++ b/testsuite/blastest/testfiles/cblat1.f
+@@ -289,7 +289,7 @@
+ *     .. Local Arrays ..
+       COMPLEX           CDOT(1), CSIZE1(4), CSIZE2(7,2), CSIZE3(14),
+      +                  CT10X(7,4,4), CT10Y(7,4,4), CT6(4,4), CT7(4,4),
+-     +                  CT8(7,4,4), CX(7), CX1(7), CY(7), CY1(7)
++     +                  CT8(7,4,4), CX(8), CX1(7), CY(7), CY1(7)
+       INTEGER           INCXS(4), INCYS(4), LENS(4,2), NS(4)
+ *     .. External Functions ..
+       COMPLEX           CDOTC, CDOTU
+diff --git a/testsuite/blastest/testfiles/dblat1.f b/testsuite/blastest/testfiles/dblat1.f
+index adb507d..e057405 100644
+--- a/testsuite/blastest/testfiles/dblat1.f
++++ b/testsuite/blastest/testfiles/dblat1.f
+@@ -252,7 +252,7 @@
+       DOUBLE PRECISION  DT10X(7,4,4), DT10Y(7,4,4), DT7(4,4),
+      +                  DT8(7,4,4), DT9X(7,4,4), DT9Y(7,4,4), DX1(7),
+      +                  DY1(7), SSIZE1(4), SSIZE2(14,2), STX(7), STY(7),
+-     +                  SX(7), SY(7)
++     +                  SX(8), SY(8)
+       INTEGER           INCXS(4), INCYS(4), LENS(4,2), NS(4)
+ *     .. External Functions ..
+       DOUBLE PRECISION  DDOT
+@@ -446,8 +446,8 @@
+       DOUBLE PRECISION  COPYX(5), COPYY(5), DT9X(7,4,4), DT9Y(7,4,4),
+      +                  DX1(7), DY1(7), MWPC(11), MWPS(11), MWPSTX(5),
+      +                  MWPSTY(5), MWPTX(11,5), MWPTY(11,5), MWPX(5),
+-     +                  MWPY(5), SSIZE2(14,2), STX(7), STY(7), SX(7),
+-     +                  SY(7)
++     +                  MWPY(5), SSIZE2(14,2), STX(7), STY(7), SX(8),
++     +                  SY(8)
+       INTEGER           INCXS(4), INCYS(4), LENS(4,2), MWPINX(11),
+      +                  MWPINY(11), MWPN(11), NS(4)
+ *     .. External Subroutines ..
+diff --git a/testsuite/blastest/testfiles/sblat1.f b/testsuite/blastest/testfiles/sblat1.f
+index a982d18..9571cd2 100644
+--- a/testsuite/blastest/testfiles/sblat1.f
++++ b/testsuite/blastest/testfiles/sblat1.f
+@@ -251,7 +251,7 @@
+       REAL              DT10X(7,4,4), DT10Y(7,4,4), DT7(4,4),
+      +                  DT8(7,4,4), DT9X(7,4,4), DT9Y(7,4,4), DX1(7),
+      +                  DY1(7), SSIZE1(4), SSIZE2(14,2), STX(7), STY(7),
+-     +                  SX(7), SY(7)
++     +                  SX(8), SY(8)
+       INTEGER           INCXS(4), INCYS(4), LENS(4,2), NS(4)
+ *     .. External Functions ..
+       REAL              SDOT
+@@ -445,8 +445,8 @@
+       REAL              COPYX(5), COPYY(5), DT9X(7,4,4), DT9Y(7,4,4),
+      +                  DX1(7), DY1(7), MWPC(11), MWPS(11), MWPSTX(5),
+      +                  MWPSTY(5), MWPTX(11,5), MWPTY(11,5), MWPX(5),
+-     +                  MWPY(5), SSIZE2(14,2), STX(7), STY(7), SX(7),
+-     +                  SY(7)
++     +                  MWPY(5), SSIZE2(14,2), STX(7), STY(7), SX(8),
++     +                  SY(8)
+       INTEGER           INCXS(4), INCYS(4), LENS(4,2), MWPINX(11),
+      +                  MWPINY(11), MWPN(11), NS(4)
+ *     .. External Subroutines ..
+diff --git a/testsuite/blastest/testfiles/zblat1.f b/testsuite/blastest/testfiles/zblat1.f
+index e2415e1..d324e22 100644
+--- a/testsuite/blastest/testfiles/zblat1.f
++++ b/testsuite/blastest/testfiles/zblat1.f
+@@ -289,7 +289,7 @@
+ *     .. Local Arrays ..
+       COMPLEX*16        CDOT(1), CSIZE1(4), CSIZE2(7,2), CSIZE3(14),
+      +                  CT10X(7,4,4), CT10Y(7,4,4), CT6(4,4), CT7(4,4),
+-     +                  CT8(7,4,4), CX(7), CX1(7), CY(7), CY1(7)
++     +                  CT8(7,4,4), CX(8), CX1(7), CY(8), CY1(7)
+       INTEGER           INCXS(4), INCYS(4), LENS(4,2), NS(4)
+ *     .. External Functions ..
+       COMPLEX*16        ZDOTC, ZDOTU

@@ -1,0 +1,45 @@
+/*
+ * Copyright (c) 2013-2014, ARM Limited
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+import datastruct.hermitian;
+
+// Computes C <- alpha*A*A^H + beta*C
+function herk(
+    alpha: Real,
+    in A: RandomAccessible<Complex>[n][k],
+    beta: Real,
+    out C: HermitianMatrix<Complex>[n][n]) {
+  Cij = beta*Cij + alpha*sum(A[i][l]*Conjugated(A[j+1][l]) forall l in 0:k-1)
+    forall i, j, Cij in C.upperTriangle;
+  // The diagonal is processed differently since its complex part is not referenced
+  Cii = beta*Cii + alpha*Re(sum(A[i][l]*Conjugated(A[i][l]) forall l in 0:k-1))
+    forall i, Cii in C.diagonal;
+}
+
+export herk<Complex Float>(A is Conjugated Array, C is Conjugated UpperHermitian) as cherk_c_u;
+export herk<Complex Float>(A is Transposed Array, C is Conjugated UpperHermitian) as cherk_t_u;
+export herk<Complex Float>(A is Conjugated Array, C is            LowerHermitian) as cherk_c_l;
+export herk<Complex Float>(A is Transposed Array, C is            LowerHermitian) as cherk_t_l;
+
+export herk<Complex Double>(A is Conjugated Array, C is Conjugated UpperHermitian) as zherk_c_u;
+export herk<Complex Double>(A is Transposed Array, C is Conjugated UpperHermitian) as zherk_t_u;
+export herk<Complex Double>(A is Conjugated Array, C is            LowerHermitian) as zherk_c_l;
+export herk<Complex Double>(A is Transposed Array, C is            LowerHermitian) as zherk_t_l;

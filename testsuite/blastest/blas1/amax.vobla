@@ -1,0 +1,44 @@
+/*
+ * Copyright (c) 2013-2014, ARM Limited
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+// Return the first k such that |Re(X[k])| + |Im(X[k])| == max_i(|Re(X[i])| + |Im(X[i])|)
+function amax(in X: Value[]): Index {
+  let k = 0;
+  let maxValue = abs(Re(X[0])) + abs(Im(X[0]));
+  for(i in 1:len(X)-1) {
+    let value = abs(Re(X[i])) + abs(Im(X[i]));
+    if(value > maxValue) { k=i; maxValue = value; }
+  }
+
+  return k;
+}
+
+export amax<Float>(X is          Column) as isamax_n;
+export amax<Float>(X is Reversed Column) as isamax_r;
+
+export amax<Double>(X is          Column) as idamax_n;
+export amax<Double>(X is Reversed Column) as idamax_r;
+
+export amax<Complex Float>(X is          Column) as icamax_n;
+export amax<Complex Float>(X is Reversed Column) as icamax_r;
+
+export amax<Complex Double>(X is          Column) as izamax_n;
+export amax<Complex Double>(X is Reversed Column) as izamax_r;

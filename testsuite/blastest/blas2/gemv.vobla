@@ -1,0 +1,226 @@
+/*
+ * Copyright (c) 2013-2014, ARM Limited
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+import datastruct.band;
+import datastruct.symmetric;
+import datastruct.hermitian;
+
+// Computes Y <- alpha*A*X + beta*Y
+function gemv(alpha: Value, in A: SparseIterable<Value>[m][n], in X: Value[n], beta: Value, out Y: Value[m]) {
+  Yi *= beta forall _, Yi in Y.sparse;
+  Y[i] += alpha*Aij*X[j] for i, j, Aij in A.sparse;
+}
+
+export gemv<Float>(A is            Array , X is          Column, Y is          Column) as sgemv_n_nn;
+export gemv<Float>(A is Transposed Array, X is          Column, Y is          Column) as sgemv_t_nn;
+export gemv<Float>(A is            Array, X is          Column, Y is Reversed Column) as sgemv_n_nr;
+export gemv<Float>(A is Transposed Array, X is          Column, Y is Reversed Column) as sgemv_t_nr;
+export gemv<Float>(A is            Array, X is Reversed Column, Y is          Column) as sgemv_n_rn;
+export gemv<Float>(A is Transposed Array, X is Reversed Column, Y is          Column) as sgemv_t_rn;
+export gemv<Float>(A is            Array, X is Reversed Column, Y is Reversed Column) as sgemv_n_rr;
+export gemv<Float>(A is Transposed Array, X is Reversed Column, Y is Reversed Column) as sgemv_t_rr;
+
+export gemv<Double>(A is            Array, X is          Column, Y is          Column) as dgemv_n_nn;
+export gemv<Double>(A is Transposed Array, X is          Column, Y is          Column) as dgemv_t_nn;
+export gemv<Double>(A is            Array, X is          Column, Y is Reversed Column) as dgemv_n_nr;
+export gemv<Double>(A is Transposed Array, X is          Column, Y is Reversed Column) as dgemv_t_nr;
+export gemv<Double>(A is            Array, X is Reversed Column, Y is          Column) as dgemv_n_rn;
+export gemv<Double>(A is Transposed Array, X is Reversed Column, Y is          Column) as dgemv_t_rn;
+export gemv<Double>(A is            Array, X is Reversed Column, Y is Reversed Column) as dgemv_n_rr;
+export gemv<Double>(A is Transposed Array, X is Reversed Column, Y is Reversed Column) as dgemv_t_rr;
+
+export gemv<Complex Float>(A is            Array, X is          Column, Y is          Column) as cgemv_n_nn;
+export gemv<Complex Float>(A is Transposed Array, X is          Column, Y is          Column) as cgemv_t_nn;
+export gemv<Complex Float>(A is Conjugated Array, X is          Column, Y is          Column) as cgemv_c_nn;
+export gemv<Complex Float>(A is            Array, X is          Column, Y is Reversed Column) as cgemv_n_nr;
+export gemv<Complex Float>(A is Transposed Array, X is          Column, Y is Reversed Column) as cgemv_t_nr;
+export gemv<Complex Float>(A is Conjugated Array, X is          Column, Y is Reversed Column) as cgemv_c_nr;
+export gemv<Complex Float>(A is            Array, X is Reversed Column, Y is          Column) as cgemv_n_rn;
+export gemv<Complex Float>(A is Transposed Array, X is Reversed Column, Y is          Column) as cgemv_t_rn;
+export gemv<Complex Float>(A is Conjugated Array, X is Reversed Column, Y is          Column) as cgemv_c_rn;
+export gemv<Complex Float>(A is            Array, X is Reversed Column, Y is Reversed Column) as cgemv_n_rr;
+export gemv<Complex Float>(A is Transposed Array, X is Reversed Column, Y is Reversed Column) as cgemv_t_rr;
+export gemv<Complex Float>(A is Conjugated Array, X is Reversed Column, Y is Reversed Column) as cgemv_c_rr;
+
+export gemv<Complex Double>(A is            Array, X is          Column, Y is          Column) as zgemv_n_nn;
+export gemv<Complex Double>(A is Transposed Array, X is          Column, Y is          Column) as zgemv_t_nn;
+export gemv<Complex Double>(A is Conjugated Array, X is          Column, Y is          Column) as zgemv_c_nn;
+export gemv<Complex Double>(A is            Array, X is          Column, Y is Reversed Column) as zgemv_n_nr;
+export gemv<Complex Double>(A is Transposed Array, X is          Column, Y is Reversed Column) as zgemv_t_nr;
+export gemv<Complex Double>(A is Conjugated Array, X is          Column, Y is Reversed Column) as zgemv_c_nr;
+export gemv<Complex Double>(A is            Array, X is Reversed Column, Y is          Column) as zgemv_n_rn;
+export gemv<Complex Double>(A is Transposed Array, X is Reversed Column, Y is          Column) as zgemv_t_rn;
+export gemv<Complex Double>(A is Conjugated Array, X is Reversed Column, Y is          Column) as zgemv_c_rn;
+export gemv<Complex Double>(A is            Array, X is Reversed Column, Y is Reversed Column) as zgemv_n_rr;
+export gemv<Complex Double>(A is Transposed Array, X is Reversed Column, Y is Reversed Column) as zgemv_t_rr;
+export gemv<Complex Double>(A is Conjugated Array, X is Reversed Column, Y is Reversed Column) as zgemv_c_rr;
+
+export gemv<Float>(A is      BandMatrix, X is          Column, Y is          Column) as sgbmv_n_nn;
+export gemv<Float>(A is      BandMatrix, X is          Column, Y is Reversed Column) as sgbmv_n_nr;
+export gemv<Float>(A is      BandMatrix, X is Reversed Column, Y is          Column) as sgbmv_n_rn;
+export gemv<Float>(A is      BandMatrix, X is Reversed Column, Y is Reversed Column) as sgbmv_n_rr;
+export gemv<Float>(A is TransBandMatrix, X is          Column, Y is          Column) as sgbmv_t_nn;
+export gemv<Float>(A is TransBandMatrix, X is          Column, Y is Reversed Column) as sgbmv_t_nr;
+export gemv<Float>(A is TransBandMatrix, X is Reversed Column, Y is          Column) as sgbmv_t_rn;
+export gemv<Float>(A is TransBandMatrix, X is Reversed Column, Y is Reversed Column) as sgbmv_t_rr;
+
+export gemv<Double>(A is      BandMatrix, X is          Column, Y is          Column) as dgbmv_n_nn;
+export gemv<Double>(A is      BandMatrix, X is          Column, Y is Reversed Column) as dgbmv_n_nr;
+export gemv<Double>(A is      BandMatrix, X is Reversed Column, Y is          Column) as dgbmv_n_rn;
+export gemv<Double>(A is      BandMatrix, X is Reversed Column, Y is Reversed Column) as dgbmv_n_rr;
+export gemv<Double>(A is TransBandMatrix, X is          Column, Y is          Column) as dgbmv_t_nn;
+export gemv<Double>(A is TransBandMatrix, X is          Column, Y is Reversed Column) as dgbmv_t_nr;
+export gemv<Double>(A is TransBandMatrix, X is Reversed Column, Y is          Column) as dgbmv_t_rn;
+export gemv<Double>(A is TransBandMatrix, X is Reversed Column, Y is Reversed Column) as dgbmv_t_rr;
+
+export gemv<Complex Float>(A is            BandMatrix, X is          Column, Y is          Column) as cgbmv_n_nn;
+export gemv<Complex Float>(A is            BandMatrix, X is          Column, Y is Reversed Column) as cgbmv_n_nr;
+export gemv<Complex Float>(A is            BandMatrix, X is Reversed Column, Y is          Column) as cgbmv_n_rn;
+export gemv<Complex Float>(A is            BandMatrix, X is Reversed Column, Y is Reversed Column) as cgbmv_n_rr;
+export gemv<Complex Float>(A is       TransBandMatrix, X is          Column, Y is          Column) as cgbmv_t_nn;
+export gemv<Complex Float>(A is       TransBandMatrix, X is          Column, Y is Reversed Column) as cgbmv_t_nr;
+export gemv<Complex Float>(A is       TransBandMatrix, X is Reversed Column, Y is          Column) as cgbmv_t_rn;
+export gemv<Complex Float>(A is       TransBandMatrix, X is Reversed Column, Y is Reversed Column) as cgbmv_t_rr;
+export gemv<Complex Float>(A is Conjugated BandMatrix, X is          Column, Y is          Column) as cgbmv_c_nn;
+export gemv<Complex Float>(A is Conjugated BandMatrix, X is          Column, Y is Reversed Column) as cgbmv_c_nr;
+export gemv<Complex Float>(A is Conjugated BandMatrix, X is Reversed Column, Y is          Column) as cgbmv_c_rn;
+export gemv<Complex Float>(A is Conjugated BandMatrix, X is Reversed Column, Y is Reversed Column) as cgbmv_c_rr;
+
+export gemv<Complex Double>(A is            BandMatrix, X is          Column, Y is          Column) as zgbmv_n_nn;
+export gemv<Complex Double>(A is            BandMatrix, X is          Column, Y is Reversed Column) as zgbmv_n_nr;
+export gemv<Complex Double>(A is            BandMatrix, X is Reversed Column, Y is          Column) as zgbmv_n_rn;
+export gemv<Complex Double>(A is            BandMatrix, X is Reversed Column, Y is Reversed Column) as zgbmv_n_rr;
+export gemv<Complex Double>(A is       TransBandMatrix, X is          Column, Y is          Column) as zgbmv_t_nn;
+export gemv<Complex Double>(A is       TransBandMatrix, X is          Column, Y is Reversed Column) as zgbmv_t_nr;
+export gemv<Complex Double>(A is       TransBandMatrix, X is Reversed Column, Y is          Column) as zgbmv_t_rn;
+export gemv<Complex Double>(A is       TransBandMatrix, X is Reversed Column, Y is Reversed Column) as zgbmv_t_rr;
+export gemv<Complex Double>(A is Conjugated BandMatrix, X is          Column, Y is          Column) as zgbmv_c_nn;
+export gemv<Complex Double>(A is Conjugated BandMatrix, X is          Column, Y is Reversed Column) as zgbmv_c_nr;
+export gemv<Complex Double>(A is Conjugated BandMatrix, X is Reversed Column, Y is          Column) as zgbmv_c_rn;
+export gemv<Complex Double>(A is Conjugated BandMatrix, X is Reversed Column, Y is Reversed Column) as zgbmv_c_rr;
+
+export gemv<Float>(A is UpperSymmetric, X is          Column, Y is          Column) as ssymv_unn;
+export gemv<Float>(A is UpperSymmetric, X is          Column, Y is Reversed Column) as ssymv_unr;
+export gemv<Float>(A is UpperSymmetric, X is Reversed Column, Y is          Column) as ssymv_urn;
+export gemv<Float>(A is UpperSymmetric, X is Reversed Column, Y is Reversed Column) as ssymv_urr;
+export gemv<Float>(A is LowerSymmetric, X is          Column, Y is          Column) as ssymv_lnn;
+export gemv<Float>(A is LowerSymmetric, X is          Column, Y is Reversed Column) as ssymv_lnr;
+export gemv<Float>(A is LowerSymmetric, X is Reversed Column, Y is          Column) as ssymv_lrn;
+export gemv<Float>(A is LowerSymmetric, X is Reversed Column, Y is Reversed Column) as ssymv_lrr;
+
+export gemv<Double>(A is UpperSymmetric, X is          Column, Y is          Column) as dsymv_unn;
+export gemv<Double>(A is UpperSymmetric, X is          Column, Y is Reversed Column) as dsymv_unr;
+export gemv<Double>(A is UpperSymmetric, X is Reversed Column, Y is          Column) as dsymv_urn;
+export gemv<Double>(A is UpperSymmetric, X is Reversed Column, Y is Reversed Column) as dsymv_urr;
+export gemv<Double>(A is LowerSymmetric, X is          Column, Y is          Column) as dsymv_lnn;
+export gemv<Double>(A is LowerSymmetric, X is          Column, Y is Reversed Column) as dsymv_lnr;
+export gemv<Double>(A is LowerSymmetric, X is Reversed Column, Y is          Column) as dsymv_lrn;
+export gemv<Double>(A is LowerSymmetric, X is Reversed Column, Y is Reversed Column) as dsymv_lrr;
+
+export gemv<Float>(A is UpperPackSymmetric, X is          Column, Y is          Column) as sspmv_unn;
+export gemv<Float>(A is UpperPackSymmetric, X is          Column, Y is Reversed Column) as sspmv_unr;
+export gemv<Float>(A is UpperPackSymmetric, X is Reversed Column, Y is          Column) as sspmv_urn;
+export gemv<Float>(A is UpperPackSymmetric, X is Reversed Column, Y is Reversed Column) as sspmv_urr;
+export gemv<Float>(A is LowerPackSymmetric, X is          Column, Y is          Column) as sspmv_lnn;
+export gemv<Float>(A is LowerPackSymmetric, X is          Column, Y is Reversed Column) as sspmv_lnr;
+export gemv<Float>(A is LowerPackSymmetric, X is Reversed Column, Y is          Column) as sspmv_lrn;
+export gemv<Float>(A is LowerPackSymmetric, X is Reversed Column, Y is Reversed Column) as sspmv_lrr;
+
+export gemv<Double>(A is UpperPackSymmetric, X is          Column, Y is          Column) as dspmv_unn;
+export gemv<Double>(A is UpperPackSymmetric, X is          Column, Y is Reversed Column) as dspmv_unr;
+export gemv<Double>(A is UpperPackSymmetric, X is Reversed Column, Y is          Column) as dspmv_urn;
+export gemv<Double>(A is UpperPackSymmetric, X is Reversed Column, Y is Reversed Column) as dspmv_urr;
+export gemv<Double>(A is LowerPackSymmetric, X is          Column, Y is          Column) as dspmv_lnn;
+export gemv<Double>(A is LowerPackSymmetric, X is          Column, Y is Reversed Column) as dspmv_lnr;
+export gemv<Double>(A is LowerPackSymmetric, X is Reversed Column, Y is          Column) as dspmv_lrn;
+export gemv<Double>(A is LowerPackSymmetric, X is Reversed Column, Y is Reversed Column) as dspmv_lrr;
+
+export gemv<Complex Float>(A is Conjugated UpperHermitian, X is          Column, Y is          Column) as chemv_unn;
+export gemv<Complex Float>(A is Conjugated UpperHermitian, X is          Column, Y is Reversed Column) as chemv_unr;
+export gemv<Complex Float>(A is Conjugated UpperHermitian, X is Reversed Column, Y is          Column) as chemv_urn;
+export gemv<Complex Float>(A is Conjugated UpperHermitian, X is Reversed Column, Y is Reversed Column) as chemv_urr;
+export gemv<Complex Float>(A is            LowerHermitian, X is          Column, Y is          Column) as chemv_lnn;
+export gemv<Complex Float>(A is            LowerHermitian, X is          Column, Y is Reversed Column) as chemv_lnr;
+export gemv<Complex Float>(A is            LowerHermitian, X is Reversed Column, Y is          Column) as chemv_lrn;
+export gemv<Complex Float>(A is            LowerHermitian, X is Reversed Column, Y is Reversed Column) as chemv_lrr;
+
+export gemv<Complex Double>(A is Conjugated UpperHermitian, X is          Column, Y is          Column) as zhemv_unn;
+export gemv<Complex Double>(A is Conjugated UpperHermitian, X is          Column, Y is Reversed Column) as zhemv_unr;
+export gemv<Complex Double>(A is Conjugated UpperHermitian, X is Reversed Column, Y is          Column) as zhemv_urn;
+export gemv<Complex Double>(A is Conjugated UpperHermitian, X is Reversed Column, Y is Reversed Column) as zhemv_urr;
+export gemv<Complex Double>(A is            LowerHermitian, X is          Column, Y is          Column) as zhemv_lnn;
+export gemv<Complex Double>(A is            LowerHermitian, X is          Column, Y is Reversed Column) as zhemv_lnr;
+export gemv<Complex Double>(A is            LowerHermitian, X is Reversed Column, Y is          Column) as zhemv_lrn;
+export gemv<Complex Double>(A is            LowerHermitian, X is Reversed Column, Y is Reversed Column) as zhemv_lrr;
+
+export gemv<Complex Float>(A is            UpperPackHermitian, X is          Column, Y is          Column) as chpmv_unn;
+export gemv<Complex Float>(A is            UpperPackHermitian, X is          Column, Y is Reversed Column) as chpmv_unr;
+export gemv<Complex Float>(A is            UpperPackHermitian, X is Reversed Column, Y is          Column) as chpmv_urn;
+export gemv<Complex Float>(A is            UpperPackHermitian, X is Reversed Column, Y is Reversed Column) as chpmv_urr;
+export gemv<Complex Float>(A is Conjugated LowerPackHermitian, X is          Column, Y is          Column) as chpmv_lnn;
+export gemv<Complex Float>(A is Conjugated LowerPackHermitian, X is          Column, Y is Reversed Column) as chpmv_lnr;
+export gemv<Complex Float>(A is Conjugated LowerPackHermitian, X is Reversed Column, Y is          Column) as chpmv_lrn;
+export gemv<Complex Float>(A is Conjugated LowerPackHermitian, X is Reversed Column, Y is Reversed Column) as chpmv_lrr;
+
+export gemv<Complex Double>(A is            UpperPackHermitian, X is          Column, Y is          Column) as zhpmv_unn;
+export gemv<Complex Double>(A is            UpperPackHermitian, X is          Column, Y is Reversed Column) as zhpmv_unr;
+export gemv<Complex Double>(A is            UpperPackHermitian, X is Reversed Column, Y is          Column) as zhpmv_urn;
+export gemv<Complex Double>(A is            UpperPackHermitian, X is Reversed Column, Y is Reversed Column) as zhpmv_urr;
+export gemv<Complex Double>(A is Conjugated LowerPackHermitian, X is          Column, Y is          Column) as zhpmv_lnn;
+export gemv<Complex Double>(A is Conjugated LowerPackHermitian, X is          Column, Y is Reversed Column) as zhpmv_lnr;
+export gemv<Complex Double>(A is Conjugated LowerPackHermitian, X is Reversed Column, Y is          Column) as zhpmv_lrn;
+export gemv<Complex Double>(A is Conjugated LowerPackHermitian, X is Reversed Column, Y is Reversed Column) as zhpmv_lrr;
+
+export gemv<Float>(A is UpperBandSymmetric, X is          Column, Y is          Column) as ssbmv_unn;
+export gemv<Float>(A is UpperBandSymmetric, X is          Column, Y is Reversed Column) as ssbmv_unr;
+export gemv<Float>(A is UpperBandSymmetric, X is Reversed Column, Y is          Column) as ssbmv_urn;
+export gemv<Float>(A is UpperBandSymmetric, X is Reversed Column, Y is Reversed Column) as ssbmv_urr;
+export gemv<Float>(A is LowerBandSymmetric, X is          Column, Y is          Column) as ssbmv_lnn;
+export gemv<Float>(A is LowerBandSymmetric, X is          Column, Y is Reversed Column) as ssbmv_lnr;
+export gemv<Float>(A is LowerBandSymmetric, X is Reversed Column, Y is          Column) as ssbmv_lrn;
+export gemv<Float>(A is LowerBandSymmetric, X is Reversed Column, Y is Reversed Column) as ssbmv_lrr;
+
+export gemv<Double>(A is UpperBandSymmetric, X is          Column, Y is          Column) as dsbmv_unn;
+export gemv<Double>(A is UpperBandSymmetric, X is          Column, Y is Reversed Column) as dsbmv_unr;
+export gemv<Double>(A is UpperBandSymmetric, X is Reversed Column, Y is          Column) as dsbmv_urn;
+export gemv<Double>(A is UpperBandSymmetric, X is Reversed Column, Y is Reversed Column) as dsbmv_urr;
+export gemv<Double>(A is LowerBandSymmetric, X is          Column, Y is          Column) as dsbmv_lnn;
+export gemv<Double>(A is LowerBandSymmetric, X is          Column, Y is Reversed Column) as dsbmv_lnr;
+export gemv<Double>(A is LowerBandSymmetric, X is Reversed Column, Y is          Column) as dsbmv_lrn;
+export gemv<Double>(A is LowerBandSymmetric, X is Reversed Column, Y is Reversed Column) as dsbmv_lrr;
+
+export gemv<Complex Float>(A is            UpperBandHermitian, X is          Column, Y is          Column) as chbmv_unn;
+export gemv<Complex Float>(A is            UpperBandHermitian, X is          Column, Y is Reversed Column) as chbmv_unr;
+export gemv<Complex Float>(A is            UpperBandHermitian, X is Reversed Column, Y is          Column) as chbmv_urn;
+export gemv<Complex Float>(A is            UpperBandHermitian, X is Reversed Column, Y is Reversed Column) as chbmv_urr;
+export gemv<Complex Float>(A is Conjugated LowerBandHermitian, X is          Column, Y is          Column) as chbmv_lnn;
+export gemv<Complex Float>(A is Conjugated LowerBandHermitian, X is          Column, Y is Reversed Column) as chbmv_lnr;
+export gemv<Complex Float>(A is Conjugated LowerBandHermitian, X is Reversed Column, Y is          Column) as chbmv_lrn;
+export gemv<Complex Float>(A is Conjugated LowerBandHermitian, X is Reversed Column, Y is Reversed Column) as chbmv_lrr;
+
+export gemv<Complex Double>(A is            UpperBandHermitian, X is          Column, Y is          Column) as zhbmv_unn;
+export gemv<Complex Double>(A is            UpperBandHermitian, X is          Column, Y is Reversed Column) as zhbmv_unr;
+export gemv<Complex Double>(A is            UpperBandHermitian, X is Reversed Column, Y is          Column) as zhbmv_urn;
+export gemv<Complex Double>(A is            UpperBandHermitian, X is Reversed Column, Y is Reversed Column) as zhbmv_urr;
+export gemv<Complex Double>(A is Conjugated LowerBandHermitian, X is          Column, Y is          Column) as zhbmv_lnn;
+export gemv<Complex Double>(A is Conjugated LowerBandHermitian, X is          Column, Y is Reversed Column) as zhbmv_lnr;
+export gemv<Complex Double>(A is Conjugated LowerBandHermitian, X is Reversed Column, Y is          Column) as zhbmv_lrn;
+export gemv<Complex Double>(A is Conjugated LowerBandHermitian, X is Reversed Column, Y is Reversed Column) as zhbmv_lrr;

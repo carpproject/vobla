@@ -1,0 +1,43 @@
+/*
+ * Copyright (c) 2013-2014, ARM Limited
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+import blas2.gemv;
+import sparse.csr;
+import sparse.cds;
+import sparse.ell;
+import sparse.hyb;
+import sparse.bcsr;
+import sparse.bell;
+import sparse.sell;
+import sparse.coo;
+
+export gemv<Float>(A is             Array) as gemv_plain;
+export gemv<Float>(A is               Csr) as gemv_csr;
+export gemv<Complex Float>(A is       Csr) as cgemv_csr;
+export gemv<Float>(A is               Csc) as gemv_csc;
+export gemv<Float>(A is               Coo) as gemv_coo;
+export gemv<Float>(A is               Cds) as gemv_cds;
+export gemv<Float>(A is               Ell) as gemv_ell;
+export gemv<Float>(A is               Hyb) as gemv_hyb;
+export gemv<Float>(A is              Bcsr) as gemv_bcsr;
+export gemv<Float>(A is              Bell) as gemv_bell;
+export gemv<Float>(A is             Sell1) as gemv_sell1;
+export gemv<Float>(A is             Sell2) as gemv_sell2;

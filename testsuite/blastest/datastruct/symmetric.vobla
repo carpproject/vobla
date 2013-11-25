@@ -1,0 +1,54 @@
+/*
+ * Copyright (c) 2013-2014, ARM Limited
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+import datastruct.storages;
+import datastruct.triangle;
+
+interface SymmetricMatrix[][] implements in SparseArray<Value>[][] {
+  upperTriangle(): UpperTriangle<Value>[][];
+}
+
+view Symmetric: BaseUpTriangle[] implements SymmetricMatrix<Value>[][] {
+  getLen1(): Index { return base.getLen1(); }
+  getLen2(): Index { return base.getLen1(); }
+
+  upperTriangle(): UpperTriangle<Value>[][] {
+    return UpTriangle(base);
+  }
+
+  iterate(): range<Index, Index, Value> {
+    yield i, j, v forall i, j, v in UpTriangle(base).iterate();
+    yield j+1, i, v forall i, j, v in UpTriangle(base).subTriangle(0, 0, 1).iterate();
+  }
+
+  sparse(): range<Index, Index, Value> {
+    yield i, j, v forall i, j, v in UpTriangle(base).sparse();
+    yield j+1, i, v forall i, j, v in
+      UpTriangle(base).subTriangle(0, 0, 1).sparse();
+  }
+}
+
+type UpperSymmetric = Symmetric(UpPlainTrigBase);
+type LowerSymmetric = Symmetric(TransLowTrig(LowPlainTrigBase));
+type UpperPackSymmetric = Symmetric(UpPackTrigBase);
+type LowerPackSymmetric = Symmetric(TransLowTrig(LowPackTrigBase));
+type UpperBandSymmetric = Symmetric(UpBandTrigBase);
+type LowerBandSymmetric = Symmetric(TransLowTrig(LowBandTrigBase));

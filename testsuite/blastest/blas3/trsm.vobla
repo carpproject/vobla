@@ -1,0 +1,92 @@
+/*
+ * Copyright (c) 2013-2014, ARM Limited
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+// A is an upper triangular matrix
+// if side == 0, computes B <- alpha*A^(-1)*B
+// if side == 1, computes B <- alpha*B*A^(-1)
+// if diag == 0, the diagonal of A is referenced
+// if diag == 1, the diagonal of A is not referenced and should be considered equal to 1
+
+function trsm(side: Index,
+              diag: Index,
+              alpha: Value,
+              in A: Value[][], // m*m or n*n
+              out B: Value[m][n]) {
+  if(diag == 1) {   // The diagonal is not referenced
+    if(side == 0) { // Computes B <- alpha*A^(-1)*B
+      for(j in (B[0][*]).getRange()) {
+        B[i][j] = alpha*B[i][j] forall i in (B[*][0]).getRange();
+        for(i in 0:len(B,1)-1 by -1) {
+          B[k][j] = B[k][j] - B[i][j]*A[k][i] forall k in 0:i-1;
+        }
+      }
+    } else {        // Computes B <- alpha*B*A^(-1)
+      for(i in (B[*][0]).getRange()) {
+        B[i][j] = alpha*B[i][j] forall j in (B[0][*]).getRange();
+        for(j in (B[0][*]).getRange()) {
+          B[i][k] = B[i][k] - B[i][j]*A[j][k] forall k in j+1:len(B,2)-1;
+        }
+      }
+    }
+  } else {          // The diagonal is referenced
+    if(side == 0) { // Computes B <- alpha*A^(-1)*B
+      for(j in (B[0][*]).getRange()) {
+        B[i][j] = alpha*B[i][j] forall i in (B[*][0]).getRange();
+        for(i in 0:len(B,1)-1 by -1) {
+          B[i][j] = B[i][j]/A[i][i];
+          B[k][j] = B[k][j] - B[i][j]*A[k][i] forall k in 0:i-1;
+        }
+      }
+    } else {        // Computes B <- alpha*B*A^(-1)
+      for(i in (B[*][0]).getRange()) {
+        B[i][j] = alpha*B[i][j] forall j in (B[0][*]).getRange();
+        for(j in (B[0][*]).getRange()) {
+          B[i][j] = B[i][j]/A[j][j];
+          B[i][k] = B[i][k] - B[i][j]*A[j][k] forall k in j+1:len(B,2)-1;
+        }
+      }
+    }
+  }
+}
+
+export trsm<Float>                                   as strsm_nn;
+export trsm<Float>(                 B is Transposed) as strsm_nt;
+export trsm<Float>(A is Transposed                 ) as strsm_tn;
+export trsm<Float>(A is Transposed, B is Transposed) as strsm_tt;
+
+export trsm<Double>                                   as dtrsm_nn;
+export trsm<Double>(                 B is Transposed) as dtrsm_nt;
+export trsm<Double>(A is Transposed                 ) as dtrsm_tn;
+export trsm<Double>(A is Transposed, B is Transposed) as dtrsm_tt;
+
+export trsm<Complex Float>                                              as ctrsm_nn;
+export trsm<Complex Float>(                            B is Transposed) as ctrsm_nt;
+export trsm<Complex Float>(A is Transposed                            ) as ctrsm_tn;
+export trsm<Complex Float>(A is Transposed,            B is Transposed) as ctrsm_tt;
+export trsm<Complex Float>(A is Conjugated Transposed                 ) as ctrsm_un;
+export trsm<Complex Float>(A is Conjugated           , B is Transposed) as ctrsm_ct;
+
+export trsm<Complex Double>                                              as ztrsm_nn;
+export trsm<Complex Double>(                            B is Transposed) as ztrsm_nt;
+export trsm<Complex Double>(A is            Transposed                 ) as ztrsm_tn;
+export trsm<Complex Double>(A is            Transposed, B is Transposed) as ztrsm_tt;
+export trsm<Complex Double>(A is Conjugated Transposed                 ) as ztrsm_un;
+export trsm<Complex Double>(A is Conjugated           , B is Transposed) as ztrsm_ct;

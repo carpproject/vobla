@@ -1,0 +1,94 @@
+/*
+ * Copyright (c) 2013-2014, ARM Limited
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+import datastruct.symmetric;
+import datastruct.hermitian;
+
+// Computes C <- alpha*A*B + beta*C
+function gemm(
+    alpha: Value,
+    in A: SparseIterable<Value>[m][k],
+    in B: Value[k][n],
+    beta: Value,
+    out C: Value[m][n]) {
+  Cij *= beta forall _, _, Cij in C.sparse;
+  C[i][j] += alpha*Ail*B[l][j] for i, l, Ail in A.sparse, j in 0:n-1;
+}
+
+export gemm<Float>(A is                Array,                  C is Transposed) as sgemm_nnt;
+export gemm<Float>(A is                Array, B is Transposed, C is Transposed) as sgemm_ntt;
+export gemm<Float>(A is     Transposed Array,                  C is Transposed) as sgemm_tnt;
+export gemm<Float>(A is     Transposed Array, B is Transposed, C is Transposed) as sgemm_ttt;
+
+export gemm<Double>(A is            Array,                  C is Transposed) as dgemm_nnt;
+export gemm<Double>(A is            Array, B is Transposed, C is Transposed) as dgemm_ntt;
+export gemm<Double>(A is Transposed Array,                  C is Transposed) as dgemm_tnt;
+export gemm<Double>(A is Transposed Array, B is Transposed, C is Transposed) as dgemm_ttt;
+
+export gemm<Complex Float>(A is            Array,                  C is Transposed) as cgemm_nnt;
+export gemm<Complex Float>(A is            Array, B is Transposed, C is Transposed) as cgemm_ntt;
+export gemm<Complex Float>(A is            Array, B is Conjugated, C is Transposed) as cgemm_nct;
+export gemm<Complex Float>(A is Transposed Array,                  C is Transposed) as cgemm_tnt;
+export gemm<Complex Float>(A is Transposed Array, B is Transposed, C is Transposed) as cgemm_ttt;
+export gemm<Complex Float>(A is Transposed Array, B is Conjugated, C is Transposed) as cgemm_tct;
+export gemm<Complex Float>(A is Conjugated Array,                  C is Transposed) as cgemm_cnt;
+export gemm<Complex Float>(A is Conjugated Array, B is Transposed, C is Transposed) as cgemm_ctt;
+export gemm<Complex Float>(A is Conjugated Array, B is Conjugated, C is Transposed) as cgemm_cct;
+
+export gemm<Complex Double>(A is            Array,                  C is Transposed) as zgemm_nnt;
+export gemm<Complex Double>(A is            Array, B is Transposed, C is Transposed) as zgemm_ntt;
+export gemm<Complex Double>(A is            Array, B is Conjugated, C is Transposed) as zgemm_nct;
+export gemm<Complex Double>(A is Transposed Array,                  C is Transposed) as zgemm_tnt;
+export gemm<Complex Double>(A is Transposed Array, B is Transposed, C is Transposed) as zgemm_ttt;
+export gemm<Complex Double>(A is Transposed Array, B is Conjugated, C is Transposed) as zgemm_tct;
+export gemm<Complex Double>(A is Conjugated Array,                  C is Transposed) as zgemm_cnt;
+export gemm<Complex Double>(A is Conjugated Array, B is Transposed, C is Transposed) as zgemm_ctt;
+export gemm<Complex Double>(A is Conjugated Array, B is Conjugated, C is Transposed) as zgemm_cct;
+
+export gemm<Float>(A is UpperSymmetric                                  ) as ssymm_n_u;
+export gemm<Float>(A is UpperSymmetric, B is Transposed, C is Transposed) as ssymm_t_u;
+export gemm<Float>(A is LowerSymmetric                                  ) as ssymm_n_l;
+export gemm<Float>(A is LowerSymmetric, B is Transposed, C is Transposed) as ssymm_t_l;
+
+export gemm<Double>(A is UpperSymmetric                                  ) as dsymm_n_u;
+export gemm<Double>(A is UpperSymmetric, B is Transposed, C is Transposed) as dsymm_t_u;
+export gemm<Double>(A is LowerSymmetric                                  ) as dsymm_n_l;
+export gemm<Double>(A is LowerSymmetric, B is Transposed, C is Transposed) as dsymm_t_l;
+
+export gemm<Complex Float>(A is UpperSymmetric                                  ) as csymm_n_u;
+export gemm<Complex Float>(A is UpperSymmetric, B is Transposed, C is Transposed) as csymm_t_u;
+export gemm<Complex Float>(A is LowerSymmetric                                  ) as csymm_n_l;
+export gemm<Complex Float>(A is LowerSymmetric, B is Transposed, C is Transposed) as csymm_t_l;
+
+export gemm<Complex Double>(A is UpperSymmetric                                  ) as zsymm_n_u;
+export gemm<Complex Double>(A is UpperSymmetric, B is Transposed, C is Transposed) as zsymm_t_u;
+export gemm<Complex Double>(A is LowerSymmetric                                  ) as zsymm_n_l;
+export gemm<Complex Double>(A is LowerSymmetric, B is Transposed, C is Transposed) as zsymm_t_l;
+
+export gemm<Complex Float>(A is            UpperHermitian                                  ) as chemm_n_u;
+export gemm<Complex Float>(A is Conjugated UpperHermitian, B is Transposed, C is Transposed) as chemm_t_u;
+export gemm<Complex Float>(A is Conjugated LowerHermitian                                  ) as chemm_n_l;
+export gemm<Complex Float>(A is            LowerHermitian, B is Transposed, C is Transposed) as chemm_t_l;
+
+export gemm<Complex Double>(A is            UpperHermitian                                  ) as zhemm_n_u;
+export gemm<Complex Double>(A is Conjugated UpperHermitian, B is Transposed, C is Transposed) as zhemm_t_u;
+export gemm<Complex Double>(A is Conjugated LowerHermitian                                  ) as zhemm_n_l;
+export gemm<Complex Double>(A is            LowerHermitian, B is Transposed, C is Transposed) as zhemm_t_l;

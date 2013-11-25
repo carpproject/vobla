@@ -1,0 +1,164 @@
+# Copyright (c) 2013-2014, ARM Limited
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE
+
+diff --git b/testsuite/blastest/testfiles/cblat2.dat a/testsuite/blastest/testfiles/cblat2.dat
+index 1633916..7222085 100644
+--- b/testsuite/blastest/testfiles/cblat2.dat
++++ a/testsuite/blastest/testfiles/cblat2.dat
+@@ -1,10 +1,10 @@
+-'CBLAT2.SUMM'     NAME OF SUMMARY OUTPUT FILE
++'output/CBLAT2.SUMM'     NAME OF SUMMARY OUTPUT FILE
+ 6                 UNIT NUMBER OF SUMMARY FILE
+-'CBLA2T.SNAP'     NAME OF SNAPSHOT OUTPUT FILE
+--1                UNIT NUMBER OF SNAPSHOT FILE (NOT USED IF .LT. 0)
++'output/CBLAT2.SNAP'     NAME OF SNAPSHOT OUTPUT FILE
++0                UNIT NUMBER OF SNAPSHOT FILE (NOT USED IF .LT. 0)
+ F        LOGICAL FLAG, T TO REWIND SNAPSHOT FILE AFTER EACH RECORD.
+ F        LOGICAL FLAG, T TO STOP ON FAILURES.
+-T        LOGICAL FLAG, T TO TEST ERROR EXITS.
++F        LOGICAL FLAG, T TO TEST ERROR EXITS.
+ 16.0     THRESHOLD VALUE OF TEST RATIO
+ 6                 NUMBER OF VALUES OF N
+ 0 1 2 3 5 9       VALUES OF N
+diff --git b/testsuite/blastest/testfiles/cblat3.dat a/testsuite/blastest/testfiles/cblat3.dat
+index 31ebe5e..09ba2d3 100644
+--- b/testsuite/blastest/testfiles/cblat3.dat
++++ a/testsuite/blastest/testfiles/cblat3.dat
+@@ -1,7 +1,7 @@
+-'CBLAT3.SUMM'     NAME OF SUMMARY OUTPUT FILE
++'output/CBLAT3.SUMM'     NAME OF SUMMARY OUTPUT FILE
+ 6                 UNIT NUMBER OF SUMMARY FILE
+-'CBLAT3.SNAP'     NAME OF SNAPSHOT OUTPUT FILE
+--1                UNIT NUMBER OF SNAPSHOT FILE (NOT USED IF .LT. 0)
++'output/CBLAT3.SNAP'     NAME OF SNAPSHOT OUTPUT FILE
++0                UNIT NUMBER OF SNAPSHOT FILE (NOT USED IF .LT. 0)
+ F        LOGICAL FLAG, T TO REWIND SNAPSHOT FILE AFTER EACH RECORD.
+ F        LOGICAL FLAG, T TO STOP ON FAILURES.
+ F        LOGICAL FLAG, T TO TEST ERROR EXITS.
+diff --git b/testsuite/blastest/testfiles/dblat2.dat a/testsuite/blastest/testfiles/dblat2.dat
+index 2d7f21a..f12b805 100644
+--- b/testsuite/blastest/testfiles/dblat2.dat
++++ a/testsuite/blastest/testfiles/dblat2.dat
+@@ -1,10 +1,10 @@
+-'DBLAT2.SUMM'     NAME OF SUMMARY OUTPUT FILE
++'output/DBLAT2.SUMM'     NAME OF SUMMARY OUTPUT FILE
+ 6                 UNIT NUMBER OF SUMMARY FILE
+-'DBLAT2.SNAP'     NAME OF SNAPSHOT OUTPUT FILE
+--1                UNIT NUMBER OF SNAPSHOT FILE (NOT USED IF .LT. 0)
++'output/DBLAT2.SNAP'     NAME OF SNAPSHOT OUTPUT FILE
++0                 UNIT NUMBER OF SNAPSHOT FILE (NOT USED IF .LT. 0)
+ F        LOGICAL FLAG, T TO REWIND SNAPSHOT FILE AFTER EACH RECORD.
+ F        LOGICAL FLAG, T TO STOP ON FAILURES.
+-T        LOGICAL FLAG, T TO TEST ERROR EXITS.
++F        LOGICAL FLAG, T TO TEST ERROR EXITS.
+ 16.0     THRESHOLD VALUE OF TEST RATIO
+ 6                 NUMBER OF VALUES OF N
+ 0 1 2 3 5 9       VALUES OF N
+diff --git b/testsuite/blastest/testfiles/dblat3.dat a/testsuite/blastest/testfiles/dblat3.dat
+index a02edaf..95ab376 100644
+--- b/testsuite/blastest/testfiles/dblat3.dat
++++ a/testsuite/blastest/testfiles/dblat3.dat
+@@ -1,10 +1,10 @@
+-'DBLAT3.SUMM'     NAME OF SUMMARY OUTPUT FILE
++'output/DBLAT3.SUMM'     NAME OF SUMMARY OUTPUT FILE
+ 6                 UNIT NUMBER OF SUMMARY FILE
+-'DBLAT3.SNAP'     NAME OF SNAPSHOT OUTPUT FILE
+--1                UNIT NUMBER OF SNAPSHOT FILE (NOT USED IF .LT. 0)
++'output/DBLAT3.SNAP'     NAME OF SNAPSHOT OUTPUT FILE
++0                 UNIT NUMBER OF SNAPSHOT FILE (NOT USED IF .LT. 0)
+ F        LOGICAL FLAG, T TO REWIND SNAPSHOT FILE AFTER EACH RECORD.
+ F        LOGICAL FLAG, T TO STOP ON FAILURES.
+-T        LOGICAL FLAG, T TO TEST ERROR EXITS.
++F        LOGICAL FLAG, T TO TEST ERROR EXITS.
+ 16.0     THRESHOLD VALUE OF TEST RATIO
+ 6                 NUMBER OF VALUES OF N
+ 0 1 2 3 5 9       VALUES OF N
+diff --git b/testsuite/blastest/testfiles/sblat2.dat a/testsuite/blastest/testfiles/sblat2.dat
+index b901670..faa8ceb 100644
+--- b/testsuite/blastest/testfiles/sblat2.dat
++++ a/testsuite/blastest/testfiles/sblat2.dat
+@@ -1,10 +1,10 @@
+-'SBLAT2.SUMM'     NAME OF SUMMARY OUTPUT FILE
++'output/SBLAT2.SUMM'     NAME OF SUMMARY OUTPUT FILE
+ 6                 UNIT NUMBER OF SUMMARY FILE
+-'SBLAT2.SNAP'     NAME OF SNAPSHOT OUTPUT FILE
+--1                UNIT NUMBER OF SNAPSHOT FILE (NOT USED IF .LT. 0)
++'output/SBLAT2.SNAP'     NAME OF SNAPSHOT OUTPUT FILE
++0                UNIT NUMBER OF SNAPSHOT FILE (NOT USED IF .LT. 0)
+ F        LOGICAL FLAG, T TO REWIND SNAPSHOT FILE AFTER EACH RECORD.
+ F        LOGICAL FLAG, T TO STOP ON FAILURES.
+-T        LOGICAL FLAG, T TO TEST ERROR EXITS.
++F        LOGICAL FLAG, T TO TEST ERROR EXITS.
+ 16.0     THRESHOLD VALUE OF TEST RATIO
+ 6                 NUMBER OF VALUES OF N
+ 0 1 2 3 5 9       VALUES OF N
+diff --git b/testsuite/blastest/testfiles/sblat3.dat a/testsuite/blastest/testfiles/sblat3.dat
+index 0b2936f..18543db 100644
+--- b/testsuite/blastest/testfiles/sblat3.dat
++++ a/testsuite/blastest/testfiles/sblat3.dat
+@@ -1,10 +1,10 @@
+-'SBLAT3.SUMM'     NAME OF SUMMARY OUTPUT FILE
++'output/SBLAT3.SUMM'     NAME OF SUMMARY OUTPUT FILE
+ 6                 UNIT NUMBER OF SUMMARY FILE
+-'SBLAT3.SNAP'     NAME OF SNAPSHOT OUTPUT FILE
+--1                UNIT NUMBER OF SNAPSHOT FILE (NOT USED IF .LT. 0)
++'output/SBLAT3.SNAP'     NAME OF SNAPSHOT OUTPUT FILE
++0                UNIT NUMBER OF SNAPSHOT FILE (NOT USED IF .LT. 0)
+ F        LOGICAL FLAG, T TO REWIND SNAPSHOT FILE AFTER EACH RECORD.
+ F        LOGICAL FLAG, T TO STOP ON FAILURES.
+-T        LOGICAL FLAG, T TO TEST ERROR EXITS.
++F        LOGICAL FLAG, T TO TEST ERROR EXITS.
+ 16.0     THRESHOLD VALUE OF TEST RATIO
+ 6                 NUMBER OF VALUES OF N
+ 0 1 2 3 5 9       VALUES OF N
+diff --git b/testsuite/blastest/testfiles/zblat2.dat a/testsuite/blastest/testfiles/zblat2.dat
+index 3e6859b..3415b23 100644
+--- b/testsuite/blastest/testfiles/zblat2.dat
++++ a/testsuite/blastest/testfiles/zblat2.dat
+@@ -1,10 +1,10 @@
+-'ZBLAT2.SUMM'     NAME OF SUMMARY OUTPUT FILE
++'output/ZBLAT2.SUMM'     NAME OF SUMMARY OUTPUT FILE
+ 6                 UNIT NUMBER OF SUMMARY FILE
+-'CBLA2T.SNAP'     NAME OF SNAPSHOT OUTPUT FILE
+--1                UNIT NUMBER OF SNAPSHOT FILE (NOT USED IF .LT. 0)
++'output/ZBLA2T.SNAP'     NAME OF SNAPSHOT OUTPUT FILE
++0                UNIT NUMBER OF SNAPSHOT FILE (NOT USED IF .LT. 0)
+ F        LOGICAL FLAG, T TO REWIND SNAPSHOT FILE AFTER EACH RECORD.
+ F        LOGICAL FLAG, T TO STOP ON FAILURES.
+-T        LOGICAL FLAG, T TO TEST ERROR EXITS.
++F        LOGICAL FLAG, T TO TEST ERROR EXITS.
+ 16.0     THRESHOLD VALUE OF TEST RATIO
+ 6                 NUMBER OF VALUES OF N
+ 0 1 2 3 5 9       VALUES OF N
+diff --git b/testsuite/blastest/testfiles/zblat3.dat a/testsuite/blastest/testfiles/zblat3.dat
+index fc79dee..25b38a7 100644
+--- b/testsuite/blastest/testfiles/zblat3.dat
++++ a/testsuite/blastest/testfiles/zblat3.dat
+@@ -1,7 +1,7 @@
+-'ZBLAT3.SUMM'     NAME OF SUMMARY OUTPUT FILE
++'output/ZBLAT3.SUMM'     NAME OF SUMMARY OUTPUT FILE
+ 6                 UNIT NUMBER OF SUMMARY FILE
+-'ZBLAT3.SNAP'     NAME OF SNAPSHOT OUTPUT FILE
+--1                UNIT NUMBER OF SNAPSHOT FILE (NOT USED IF .LT. 0)
++'output/ZBLAT3.SNAP'     NAME OF SNAPSHOT OUTPUT FILE
++0                UNIT NUMBER OF SNAPSHOT FILE (NOT USED IF .LT. 0)
+ F        LOGICAL FLAG, T TO REWIND SNAPSHOT FILE AFTER EACH RECORD.
+ F        LOGICAL FLAG, T TO STOP ON FAILURES.
+ F        LOGICAL FLAG, T TO TEST ERROR EXITS.

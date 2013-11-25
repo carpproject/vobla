@@ -1,0 +1,48 @@
+/*
+ * Copyright (c) 2013-2014, ARM Limited
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+// Compute X <- alpha*X with alpha  and X having the same type
+function scal(alpha: Value, out X: Value[]) {
+  Xi = alpha*Xi forall _, Xi in X.sparse;
+}
+
+// Compute X <- alpha*X with alpha being real and X complex
+function rscal(alpha: Real, out X: Complex[]) {
+  Xi = alpha*Xi forall _, Xi in X.sparse;
+}
+
+export scal<Float>(X is          Column) as sscal_n;
+export scal<Float>(X is Reversed Column) as sscal_r;
+
+export scal<Double>(X is          Column) as dscal_n;
+export scal<Double>(X is Reversed Column) as dscal_r;
+
+export scal<Complex Float>(X is          Column) as cscal_n;
+export scal<Complex Float>(X is Reversed Column) as cscal_r;
+
+export scal<Complex Double>(X is          Column) as zscal_n;
+export scal<Complex Double>(X is Reversed Column) as zscal_r;
+
+export rscal<Float>(X is          Column) as csscal_n;
+export rscal<Float>(X is Reversed Column) as csscal_r;
+
+export rscal<Double>(X is          Column) as zdscal_n;
+export rscal<Double>(X is Reversed Column) as zdscal_r;

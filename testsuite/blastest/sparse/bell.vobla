@@ -1,0 +1,60 @@
+/*
+ * Copyright (c) 2013-2014, ARM Limited
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+// A description of the BELL format can be found here:
+// http://www.vuduc.com/pubs/choi2010-gpu-spmv.pdf
+
+storage BellStorage {
+  nRows: Index;
+  nCols: Index;
+  blockNRows: Index;
+  blockNCols: Index;
+  sliceSize: Index;
+  nBlocks: Index;
+  nSlices: Index;
+  permutation: Index[nSlices][sliceSize];
+  slicePtr: Index[nSlices];
+  colIdx: Index[nBlocks/sliceSize][sliceSize];
+  data: Value[nBlocks/sliceSize][blockNRows][blockNCols][sliceSize];
+}
+
+type Bell: BellStorage implements SparseIterable<Value>[][] {
+  parameter:
+  interface:
+    getLen1(): Index { return nRows; }
+    getLen2(): Index { return nCols; }
+
+    sparseIterate(): range<Index, Index, &Value> {
+      forall(slice in 0:nSlices-1) {
+        let sliceBeg = slicePtr[slice];
+        let sliceEnd = slicePtr[slice+1];
+        let sliceWidth = (sliceEnd - sliceBeg)/sliceSize;
+        forall(blockRow in 0:sliceSize-1) {
+          let rowOffset = permutation[slice][blockRow];
+          forall(block in 0:sliceWidth-1) {
+             let colOffset = colIdx[sliceBeg + block][blockRow];
+             yield i+rowOffset, j+colOffset, data[sliceBeg + block][i][j][blockRow]
+              forall i in 0:blockNRows-1, j in 0:blockNCols-1;
+          }
+        }
+      }
+    }
+}

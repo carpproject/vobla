@@ -1,0 +1,64 @@
+# Copyright (c) 2013-2014, ARM Limited
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE
+
+AC_INIT([vobla], [0.01], [carp@arm.com])
+AC_CONFIG_AUX_DIR([build-aux])
+AC_CONFIG_MACRO_DIR([m4])
+
+dnl Scala installation
+AC_SUBST(SCALA_HOME)
+AC_ARG_WITH([scala],
+  [AS_HELP_STRING([--with-scala=dir],[directory containing scala])],
+  [SCALA_HOME="$with_scala"],
+  [AC_MSG_ERROR([please specify path to scala installation using --with-scala])]
+)
+AC_CHECK_PROG([scala_found],["scala"],[yes],[no],["$SCALA_HOME/bin"])
+if test "x$scala_found" != "xyes"; then
+  AC_MSG_ERROR([could not find scala executable])
+fi
+
+dnl ANTLR jars
+AC_SUBST(ANTLR_HOME)
+AC_ARG_WITH([antlr3],
+  [AS_HELP_STRING([--with-antlr3=dir],[directory containing ANTLR3 jars])],
+  [ANTLR_HOME="$with_antlr3"],
+  [AC_MSG_ERROR([please specify path to ANTLR3 jars using --with-antlr3])]
+)
+AC_CHECK_FILE(["$ANTLR_HOME/antlr3.jar"],[],[AC_MSG_ERROR([could not find file])])
+AC_CHECK_FILE(["$ANTLR_HOME/ant-antlr3.jar"],[],[AC_MSG_ERROR([could not find file])])
+
+dnl PENCIL
+AC_ARG_WITH([pencil],
+  [AS_HELP_STRING([--with-pencil=dir],[directory containing PENCIL])],
+  [PENCILDIR="$with_pencil"],
+  [PENCILDIR="pencil"]
+)
+AC_CHECK_FILE(["$PENCILDIR/src"],[],[AC_MSG_ERROR([could not find pencil directory])])
+
+dnl Automatically configure PENCIL dir if it is a subdir.
+dnl Also run autoconf in PENCIL dir if needed.
+if test "x$PENCILDIR" = "xpencil"; then
+  AC_CHECK_FILE(["$PENCILDIR/configure"],[],[cd "$PENCILDIR" && autoconf && cd ..])
+  AC_CONFIG_SUBDIRS(pencil)
+fi
+
+AC_CONFIG_FILES([vobla], [chmod +x vobla])
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT

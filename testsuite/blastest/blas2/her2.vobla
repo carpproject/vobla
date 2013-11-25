@@ -1,0 +1,66 @@
+/*
+ * Copyright (c) 2013-2014, ARM Limited
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+import datastruct.hermitian;
+
+// Computes Y <- alpha*X*Y^H + Y*(alpha*X)^H + A
+function her2(alpha: Complex, in X: Complex[n], in Y: Complex[n],
+  out A: HermitianMatrix<Complex>[n][n]) {
+  Aii += 2.0*Re(alpha*X[i]*Conjugated(Y[i])) forall i, Aii in A.diagonal;
+  Aij += alpha*X[i]*Conjugated(Y[j+1]) + Conjugated(alpha*X[j+1])*Y[i]
+      forall i, j, Aij in A.upperTriangle;
+}
+
+export her2<Float>(A is Conjugated UpperHermitian, X is          Column, Y is          Column) as cher2_unn;
+export her2<Float>(A is Conjugated UpperHermitian, X is          Column, Y is Reversed Column) as cher2_unr;
+export her2<Float>(A is Conjugated UpperHermitian, X is Reversed Column, Y is          Column) as cher2_urn;
+export her2<Float>(A is Conjugated UpperHermitian, X is Reversed Column, Y is Reversed Column) as cher2_urr;
+export her2<Float>(A is            LowerHermitian, X is          Column, Y is          Column) as cher2_lnn;
+export her2<Float>(A is            LowerHermitian, X is          Column, Y is Reversed Column) as cher2_lnr;
+export her2<Float>(A is            LowerHermitian, X is Reversed Column, Y is          Column) as cher2_lrn;
+export her2<Float>(A is            LowerHermitian, X is Reversed Column, Y is Reversed Column) as cher2_lrr;
+
+export her2<Double>(A is Conjugated UpperHermitian, X is          Column, Y is          Column) as zher2_unn;
+export her2<Double>(A is Conjugated UpperHermitian, X is          Column, Y is Reversed Column) as zher2_unr;
+export her2<Double>(A is Conjugated UpperHermitian, X is Reversed Column, Y is          Column) as zher2_urn;
+export her2<Double>(A is Conjugated UpperHermitian, X is Reversed Column, Y is Reversed Column) as zher2_urr;
+export her2<Double>(A is            LowerHermitian, X is          Column, Y is          Column) as zher2_lnn;
+export her2<Double>(A is            LowerHermitian, X is          Column, Y is Reversed Column) as zher2_lnr;
+export her2<Double>(A is            LowerHermitian, X is Reversed Column, Y is          Column) as zher2_lrn;
+export her2<Double>(A is            LowerHermitian, X is Reversed Column, Y is Reversed Column) as zher2_lrr;
+
+export her2<Float>(A is            UpperPackHermitian, X is          Column, Y is          Column) as chpr2_unn;
+export her2<Float>(A is            UpperPackHermitian, X is          Column, Y is Reversed Column) as chpr2_unr;
+export her2<Float>(A is            UpperPackHermitian, X is Reversed Column, Y is          Column) as chpr2_urn;
+export her2<Float>(A is            UpperPackHermitian, X is Reversed Column, Y is Reversed Column) as chpr2_urr;
+export her2<Float>(A is Conjugated LowerPackHermitian, X is          Column, Y is          Column) as chpr2_lnn;
+export her2<Float>(A is Conjugated LowerPackHermitian, X is          Column, Y is Reversed Column) as chpr2_lnr;
+export her2<Float>(A is Conjugated LowerPackHermitian, X is Reversed Column, Y is          Column) as chpr2_lrn;
+export her2<Float>(A is Conjugated LowerPackHermitian, X is Reversed Column, Y is Reversed Column) as chpr2_lrr;
+
+export her2<Double>(A is            UpperPackHermitian, X is          Column, Y is          Column) as zhpr2_unn;
+export her2<Double>(A is            UpperPackHermitian, X is          Column, Y is Reversed Column) as zhpr2_unr;
+export her2<Double>(A is            UpperPackHermitian, X is Reversed Column, Y is          Column) as zhpr2_urn;
+export her2<Double>(A is            UpperPackHermitian, X is Reversed Column, Y is Reversed Column) as zhpr2_urr;
+export her2<Double>(A is Conjugated LowerPackHermitian, X is          Column, Y is          Column) as zhpr2_lnn;
+export her2<Double>(A is Conjugated LowerPackHermitian, X is          Column, Y is Reversed Column) as zhpr2_lnr;
+export her2<Double>(A is Conjugated LowerPackHermitian, X is Reversed Column, Y is          Column) as zhpr2_lrn;
+export her2<Double>(A is Conjugated LowerPackHermitian, X is Reversed Column, Y is Reversed Column) as zhpr2_lrr;

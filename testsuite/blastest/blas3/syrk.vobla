@@ -1,0 +1,51 @@
+/*
+ * Copyright (c) 2013-2014, ARM Limited
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+import datastruct.symmetric;
+
+// Computes C <- alpha*A*A^T + beta*C
+function syrk(alpha: Value,
+              in A: RandomAccessible<Value>[n][k],
+              beta: Value,
+              out C: SymmetricMatrix<Value>[n][n]) {
+  Cij = beta*Cij + alpha*sum(A[i][l]*A[j][l] forall l in 0:k-1)
+    forall i, j, Cij in C.upperTriangle;
+}
+
+export syrk<Float>(A is            Array, C is UpperSymmetric) as ssyrk_n_u;
+export syrk<Float>(A is Transposed Array, C is UpperSymmetric) as ssyrk_t_u;
+export syrk<Float>(A is            Array, C is LowerSymmetric) as ssyrk_n_l;
+export syrk<Float>(A is Transposed Array, C is LowerSymmetric) as ssyrk_t_l;
+
+export syrk<Double>(A is            Array, C is UpperSymmetric) as dsyrk_n_u;
+export syrk<Double>(A is Transposed Array, C is UpperSymmetric) as dsyrk_t_u;
+export syrk<Double>(A is            Array, C is LowerSymmetric) as dsyrk_n_l;
+export syrk<Double>(A is Transposed Array, C is LowerSymmetric) as dsyrk_t_l;
+
+export syrk<Complex Float>(A is            Array, C is UpperSymmetric) as csyrk_n_u;
+export syrk<Complex Float>(A is Transposed Array, C is UpperSymmetric) as csyrk_t_u;
+export syrk<Complex Float>(A is            Array, C is LowerSymmetric) as csyrk_n_l;
+export syrk<Complex Float>(A is Transposed Array, C is LowerSymmetric) as csyrk_t_l;
+
+export syrk<Complex Double>(A is            Array, C is UpperSymmetric) as zsyrk_n_u;
+export syrk<Complex Double>(A is Transposed Array, C is UpperSymmetric) as zsyrk_t_u;
+export syrk<Complex Double>(A is            Array, C is LowerSymmetric) as zsyrk_n_l;
+export syrk<Complex Double>(A is Transposed Array, C is LowerSymmetric) as zsyrk_t_l;

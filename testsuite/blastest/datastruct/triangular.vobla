@@ -1,0 +1,92 @@
+/*
+ * Copyright (c) 2013-2014, ARM Limited
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+import datastruct.storages;
+import datastruct.array1D;
+import datastruct.triangle;
+
+interface TriangularMatrix[][] implements SparseArray<Value>[][] {
+  // Get a triangle representing the upper or lower part of the matrix
+  triangle(): Triangle<Value>[][];
+  diagonal(): Array<Value>[];
+}
+
+view UpTriangular: BaseUpTriangle[] implements TriangularMatrix<Value>[][] {
+  getLen1(): Index { return base.getLen1(); }
+  getLen2(): Index { return base.getLen1(); }
+  triangle(): Triangle<Value>[][] { return UpTriangle(base); }
+  diagonal(): Array<Value>[] { return base.diagonal(); }
+
+  sparse(): range<Index, Index, &Value> {
+    yield i, j, v forall i, j, v in this.triangle().iterate();
+  }
+
+  iterate(): range<Index, Index, Value> {
+    yield i, j, 0 forall i in 0:base.getLen1()-1, j in 0:i-1;
+    yield i, j, v forall i, j, v in this.triangle().iterate();
+  }
+}
+
+view LowTriangular: BaseLowTriangle[] implements TriangularMatrix<Value>[][] {
+  getLen1(): Index { return base.getLen1(); }
+  getLen2(): Index { return base.getLen1(); }
+  triangle(): Triangle<Value>[][] { return LowTriangle(base); }
+  diagonal(): Array<Value>[] { return base.diagonal(); }
+
+  sparse(): range<Index, Index, &Value> {
+    yield i, j, v forall i, j, v in this.triangle().iterate();
+  }
+
+  iterate(): range<Index, Index, Value> {
+    yield i, j, 0 forall j in 0:base.getLen1()-1, i in 0:j-1;
+    yield i, j, v forall i, j, v in this.triangle().iterate();
+  }
+}
+
+// Plain triangular matrices
+type UpperTriangular = UpTriangular(UpPlainTrigBase);
+type LowerTriangular = LowTriangular(LowPlainTrigBase);
+type TransUpperTriangular = LowTriangular(TransUpTrig(UpPlainTrigBase));
+type TransLowerTriangular = UpTriangular(TransLowTrig(LowPlainTrigBase));
+type UnitUpperTriangular = UpTriangular(UnitUpTrig(UpPlainTrigBase));
+type UnitLowerTriangular = LowTriangular(UnitLowTrig(LowPlainTrigBase));
+type TransUnitUpperTriangular = LowTriangular(TransUpTrig(UnitUpTrig(UpPlainTrigBase)));
+type TransUnitLowerTriangular = UpTriangular(TransLowTrig(UnitLowTrig(LowPlainTrigBase)));
+
+// Packed triangular matrices
+type UpperPackTriangular = UpTriangular(UpPackTrigBase);
+type LowerPackTriangular = LowTriangular(LowPackTrigBase);
+type TransUpperPackTriangular = LowTriangular(TransUpTrig(UpPackTrigBase));
+type TransLowerPackTriangular = UpTriangular(TransLowTrig(LowPackTrigBase));
+type UnitUpperPackTriangular = UpTriangular(UnitUpTrig(UpPackTrigBase));
+type UnitLowerPackTriangular = LowTriangular(UnitLowTrig(LowPackTrigBase));
+type TransUnitUpperPackTriangular = LowTriangular(TransUpTrig(UnitUpTrig(UpPackTrigBase)));
+type TransUnitLowerPackTriangular = UpTriangular(TransLowTrig(UnitLowTrig(LowPackTrigBase)));
+
+// Band triangular matrices
+type UpperBandTriangular = UpTriangular(UpBandTrigBase);
+type LowerBandTriangular = LowTriangular(LowBandTrigBase);
+type TransUpperBandTriangular = LowTriangular(TransUpTrig(UpBandTrigBase));
+type TransLowerBandTriangular = UpTriangular(TransLowTrig(LowBandTrigBase));
+type UnitUpperBandTriangular = UpTriangular(UnitUpTrig(UpBandTrigBase));
+type UnitLowerBandTriangular = LowTriangular(UnitLowTrig(LowBandTrigBase));
+type TransUnitUpperBandTriangular = LowTriangular(TransUpTrig(UnitUpTrig(UpBandTrigBase)));
+type TransUnitLowerBandTriangular = UpTriangular(TransLowTrig(UnitLowTrig(LowBandTrigBase)));

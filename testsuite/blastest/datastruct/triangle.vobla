@@ -1,0 +1,304 @@
+/*
+ * Copyright (c) 2013-2014, ARM Limited
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+import datastruct.storages;
+import datastruct.array1D;
+
+interface UpperTriangle[][] implements Triangle<Value>[][] { }
+interface LowerTriangle[][] implements Triangle<Value>[][] { }
+interface Triangle[][] implements Measurable<Value>[][] {
+  // Iterate over the upper or lower triangle
+  iterate(): range<Index, Index, &Value>;
+  sparse(): range<Index, Index, &Value>;
+  iterateFromBigRow(): range<Index, Iterable<Value>[], Index>;
+  iterateFromSmallRow(): range<Index, Iterable<Value>[], Index>;
+  diagonal(): Array<Value>[];
+  subTriangle(i: Index, j: Index, h: Index): Triangle<Value>[][];
+}
+
+interface BaseUpTriangle[] implements Measurable<Value>[] {
+  getRow(i: Index): Iterable<Value>[];
+  getCol(i: Index): Iterable<Value>[];
+  subTriangle(i: Index, j: Index, h: Index): BaseUpTriangle<Value>[];
+  diagonal(): Array<Value>[];
+}
+
+interface BaseLowTriangle[] implements Measurable<Value>[] {
+  getRow(i: Index): Iterable<Value>[];
+  getCol(i: Index): Iterable<Value>[];
+  subTriangle(i: Index, j: Index, h: Index): BaseLowTriangle<Value>[];
+  diagonal(): Array<Value>[];
+}
+
+view UpTriangle: BaseUpTriangle[] implements UpperTriangle<Value>[][] {
+  getLen1(): Index { return len(base); }
+  getLen2(): Index { return len(base); }
+  diagonal(): Array<Value>[] { return base.diagonal; }
+
+  iterateFromBigRow(): range<Index, Iterable<Value>[], Index> {
+    yield i, base.getRow(i), i forall i in 0:len(base)-1;
+  }
+
+  iterateFromSmallRow(): range<Index, Iterable<Value>[], Index> {
+    yield i, base.getRow(i), i forall i in 0:len(base)-1 by -1;
+  }
+
+  subTriangle(i: Index, j: Index, h: Index): Triangle<Value>[][] {
+    return UpTriangle(base.subTriangle(i, j, h));
+  }
+
+  iterate(): range<Index, Index, &Value> {
+    yield i, j+i, v forall i in 0:getLen1()-1, j, v in base.getRow(i);
+  }
+
+  sparse(): range<Index, Index, &Value> {
+    yield i, j+i, v forall i in 0:getLen1()-1, j, v in base.getRow(i).sparse;
+  }
+}
+
+view LowTriangle: BaseLowTriangle[] implements LowerTriangle<Value>[][] {
+  getLen1(): Index { return len(base); }
+  getLen2(): Index { return len(base); }
+  diagonal(): Array<Value>[] { return base.diagonal; }
+
+  iterateFromBigRow(): range<Index, Iterable<Value>[], Index> {
+    yield i, base.getRow(i), 0 forall i in 0:len(base)-1 by -1;
+  }
+
+  iterateFromSmallRow(): range<Index, Iterable<Value>[], Index> {
+    yield i, base.getRow(i), 0 forall i in 0:len(base)-1;
+  }
+
+  subTriangle(i: Index, j: Index, h: Index): Triangle<Value>[][] {
+    return LowTriangle(base.subTriangle(i, j, h));
+  }
+
+  iterate(): range<Index, Index, &Value> {
+    yield i, j, v forall i in 0:len(base)-1, j, v in base.getRow(i);
+  }
+
+  sparse(): range<Index, Index, &Value> {
+    yield i, j, v forall i in 0:len(base)-1, j, v in base.getRow(i).sparse;
+  }
+}
+
+view TransUpTrig: BaseUpTriangle[] implements BaseLowTriangle<Value>[] {
+  getLen1(): Index { return base.getLen1(); }
+  diagonal(): Array<Value>[] { return base.diagonal(); }
+  getRow(i: Index): Iterable<Value>[] { return base.getCol(i); }
+  getCol(i: Index): Iterable<Value>[] { return base.getRow(i); }
+  subTriangle(i: Index, j: Index, h: Index): BaseLowTriangle<Value>[] {
+    return TransUpTrig(base.subTriangle(j, i, h));
+  }
+}
+
+view TransLowTrig: BaseLowTriangle[] implements BaseUpTriangle<Value>[] {
+  getLen1(): Index { return base.getLen1(); }
+  diagonal(): Array<Value>[] { return base.diagonal(); }
+  getRow(i: Index): Iterable<Value>[] { return base.getCol(i); }
+  getCol(i: Index): Iterable<Value>[] { return base.getRow(i); }
+  subTriangle(i: Index, j: Index, h: Index): BaseUpTriangle<Value>[] {
+    return TransLowTrig(base.subTriangle(j, i, h));
+  }
+}
+
+view UnitUpTrig: BaseUpTriangle[] implements in BaseUpTriangle<Value>[] {
+  getLen1(): Index { return base.getLen1(); }
+  diagonal(): in Array<Value>[] { return DenseArray1D(UnitArray1D(base)); }
+
+  getRow(i: Index): in Iterable<Value>[] {
+    return UnitBeg(base.subTriangle(0, 0, 1).getRow(i));
+  }
+
+  getCol(i: Index): in Iterable<Value>[] {
+    return UnitEnd(base.subTriangle(0, 0, 1).getCol(i-1));
+  }
+
+  subTriangle(i: Index, j: Index, h: Index): in BaseUpTriangle<Value>[] {
+    return base.subTriangle(j, i, h);
+  }
+}
+
+view UnitLowTrig: BaseLowTriangle[] implements in BaseLowTriangle<Value>[] {
+  getLen1(): Index { return base.getLen1(); }
+  diagonal(): in Array<Value>[] { return DenseArray1D(UnitArray1D(base)); }
+
+  getRow(i: Index): in Iterable<Value>[] {
+    return UnitEnd(base.subTriangle(0, 0, 1).getRow(i-1));
+  }
+
+  getCol(i: Index): in Iterable<Value>[] {
+    return UnitBeg(base.subTriangle(0, 0, 1).getCol(i));
+  }
+
+  subTriangle(i: Index, j: Index, h: Index): in  BaseLowTriangle<Value>[] {
+    return base.subTriangle(j, i, h);
+  }
+}
+
+type UpPlainTrigBase: PlainMatrixStorage implements BaseUpTriangle<Value>[] {
+  parameter:
+    n: Index;
+    offset1: Index;
+    offset2: Index;
+  interface:
+    getLen1(): Index { return n; }
+
+    diagonal(): Array<Value>[] {
+      return ApplyConj(Diag(data[offset1:offset1+n-1][offset2:offset2+n-1]));
+    }
+
+    getRow(i: Index): Iterable<Value>[] {
+      return ApplyConj(data[i+offset1][offset2+i:n+offset2-1]);
+    }
+
+    getCol(i: Index): Iterable<Value>[] {
+      return ApplyConj(data[offset1:offset1+i][offset2+i]);
+    }
+
+    subTriangle(i: Index, j: Index, h: Index): BaseUpTriangle<Value>[] {
+      return UpPlainTrigBase(n-i-j-h, i+offset1, h+offset2);
+    }
+}
+
+type LowPlainTrigBase: PlainMatrixStorage implements BaseLowTriangle<Value>[] {
+  parameter:
+    n: Index;
+    offset1: Index;
+    offset2: Index;
+  interface:
+    getLen1(): Index { return n; }
+
+    diagonal(): Array<Value>[] {
+      return ApplyConj(Diag(data[offset1:offset1+n-1][offset2:offset2+n-1]));
+    }
+
+    getRow(i: Index): Iterable<Value>[] {
+      return ApplyConj(data[i+offset1][offset2:offset2+i]);
+    }
+
+    getCol(i: Index): Iterable<Value>[] {
+      return ApplyConj(data[offset1+i:offset1+n-1][offset2+i]);
+    }
+
+    subTriangle(i: Index, j: Index, h: Index): BaseLowTriangle<Value>[] {
+      return LowPlainTrigBase(n-i-j-h, h+offset1, j+offset2);
+    }
+}
+
+type UpPackTrigBase: PackedTriangleStorage implements BaseUpTriangle<Value>[] {
+  parameter:
+    n: Index;
+    offset1: Index;
+    offset2: Index;
+  interface:
+    getLen1(): Index { return n; }
+    diagonal(): Array<Value>[] { return DenseArray1D(UpperPackedDiagonal()); }
+
+    getRow(i: Index): Iterable<Value>[] {
+      return DenseArray1D(UpPackedRow(i+offset1, n-i, i+offset2));
+    }
+
+    getCol(i: Index): Iterable<Value>[] {
+      let offset = offset1 + ((i+offset2)*(i+offset2+1))/2;
+      return ApplyConj(data[offset:offset+i]);
+    }
+
+    subTriangle(i: Index, j: Index, h: Index): BaseUpTriangle<Value>[] {
+      return UpPackTrigBase(n-i-j-h, i+offset1, h+offset2);
+    }
+}
+
+type LowPackTrigBase: PackedTriangleStorage implements BaseLowTriangle<Value>[] {
+  parameter:
+    n: Index;
+    offset1: Index;
+    offset2: Index;
+  interface:
+    getLen1(): Index { return n; }
+    diagonal(): Array<Value>[] { return DenseArray1D(LowerPackedDiagonal()); }
+
+    getRow(i: Index): Iterable<Value>[] {
+      return DenseArray1D(LowPackedRow(i+offset1, i+1, offset2));
+    }
+
+    getCol(i: Index): Iterable<Value>[] {
+      let offset = offset1 + ((i+offset2)*(2*nBase-i-offset2+1))/2;
+      return ApplyConj(data[offset:offset+n-1-i]);
+    }
+
+    subTriangle(i: Index, j: Index, h: Index): BaseLowTriangle<Value>[] {
+      return LowPackTrigBase(n-i-j-h, h+offset1, j+offset2);
+    }
+}
+
+type UpBandTrigBase: PlainMatrixStorage implements BaseUpTriangle<Value>[] {
+  parameter:
+    n: Index;
+    k: Index;
+    offset1: Index;
+    offset2: Index;
+  interface:
+    getLen1(): Index { return n; }
+
+    diagonal():  Array<Value>[] {
+      return ApplyConj(data[offset2:offset2+n-1][offset1+k]);
+    }
+
+    getRow(i: Index): Iterable<Value>[] {
+      return FilledADiag(n-i, offset2+i, offset1+k, 0, max(0, n-i-k-1));
+    }
+
+    getCol(i: Index): Iterable<Value>[] {
+      return FilledRow(i+1, offset2+i, offset1+max(0, k-i), max(0, i-k), 0);
+    }
+
+    subTriangle(i: Index, j: Index, h: Index): BaseUpTriangle<Value>[] {
+      return UpBandTrigBase(n-i-j-h, k-h, offset1+i, offset2+h);
+    }
+}
+
+type LowBandTrigBase: PlainMatrixStorage implements BaseLowTriangle<Value>[] {
+  parameter:
+    n: Index;
+    k: Index;
+    offset1: Index;
+    offset2: Index;
+  interface:
+    getLen1(): Index { return n; }
+
+    diagonal():  Array<Value>[] {
+      return ApplyConj(data[offset2:offset2+n-1][offset1]);
+    }
+
+    getRow(i: Index): Iterable<Value>[] {
+      let nFill = max(0, i-k);
+      return FilledADiag(i+1, offset2+nFill, offset1+min(k, i), nFill, 0);
+    }
+
+    getCol(i: Index): Iterable<Value>[] {
+      return FilledRow(n-i, offset2+i, offset1, 0, max(0, n-i-k-1));
+    }
+
+    subTriangle(i: Index, j: Index, h: Index): BaseLowTriangle<Value>[] {
+      return LowBandTrigBase(n-i-j-h, k-h, offset1+h, offset2+j);
+    }
+}

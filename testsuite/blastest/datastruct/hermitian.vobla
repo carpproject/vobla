@@ -1,0 +1,64 @@
+/*
+ * Copyright (c) 2013-2014, ARM Limited
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+import datastruct.storages;
+import datastruct.triangle;
+import datastruct.array1D;
+
+interface HermitianMatrix[][] implements in SparseArray<Value>[][] {
+  // Get a triangle representing the upper part of the matrix
+  // Does not include the diagonal
+  upperTriangle(): Triangle<Value>[][];
+  diagonal(): Array<Real>[];
+}
+
+view Hermitian: BaseUpTriangle[] implements HermitianMatrix<Value>[][] {
+  getLen1(): Index { return base.getLen1(); }
+  getLen2(): Index { return base.getLen1(); }
+  diagonal(): Array<Real>[] { return base.diagonal().re(); }
+
+  upperTriangle(): Triangle<Value>[][] {
+    return UpTriangle(base.subTriangle(0, 0, 1));
+  }
+
+  iterate(): range<Index, Index, Value> {
+    yield i, i, v forall i, v in this.diagonal().iterate();
+    forall(i, j, v in this.upperTriangle().iterate()) {
+      yield i, j+1, v;
+      yield j+1, i, Conjugated(v);
+    }
+  }
+
+  sparse(): range<Index, Index, Value> {
+    yield i, i, v forall i, v in this.diagonal().sparse();
+    forall(i, j, v in this.upperTriangle().sparse()) {
+      yield i, j+1, v;
+      yield j+1, i, Conjugated(v);
+    }
+  }
+}
+
+type UpperHermitian = Hermitian(UpPlainTrigBase);
+type LowerHermitian = Hermitian(TransLowTrig(LowPlainTrigBase));
+type UpperPackHermitian = Hermitian(UpPackTrigBase);
+type LowerPackHermitian = Hermitian(TransLowTrig(LowPackTrigBase));
+type UpperBandHermitian = Hermitian(UpBandTrigBase);
+type LowerBandHermitian = Hermitian(TransLowTrig(LowBandTrigBase));

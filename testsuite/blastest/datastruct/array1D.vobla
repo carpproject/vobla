@@ -1,0 +1,189 @@
+/*
+ * Copyright (c) 2013-2014, ARM Limited
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+import datastruct.storages;
+
+interface DenseArrayBase[] implements RandomAccessible<Value>[] {
+  re(): DenseArrayBase<Real>[];
+  im(): in DenseArrayBase<Real>[];
+}
+
+view DenseArray1D: DenseArrayBase[] implements Array<Value>[] {
+  getLen1(): Index { return len(base); }
+  access(i: Index): &Value { return base[i]; }
+  getRange(): range<Index> { yield i forall i in 0:len(base)-1; }
+  re(): Array<Real>[] { return DenseArray1D(base.re); }
+  im(): in Array<Real>[] { return DenseArray1D(base.im); }
+
+  iterate(): range<Index, &Value> {
+    yield i, this[i] forall i in this.getRange;
+  }
+
+  sparse(): range<Index, &Value> { yield i, v forall i, v in this; }
+}
+
+view EmptyReArray1D: Measurable[] implements in DenseArrayBase<Real>[] {
+  getLen1(): Index { return len(base); }
+  access(i: Index): Real { return 0; }
+  re(): in DenseArrayBase<Real>[] { return this; }
+  im(): in DenseArrayBase<Real>[] { return this; }
+}
+
+view UnitArray1D: Measurable[] implements in DenseArrayBase<Value>[] {
+  getLen1(): Index { return len(base); }
+  access(i: Index): Value { return 1; }
+  re(): in DenseArrayBase<Real>[] { return ReArray1D(this); }
+  im(): in DenseArrayBase<Real>[] { return EmptyReArray1D(this); }
+}
+
+view ReArray1D: RandomAccessible[] implements DenseArrayBase<Real>[] {
+  getLen1(): Index { return len(base); }
+  access(i: Index): &Real { return Re(base[i]); }
+  re(): DenseArrayBase<Real>[] { return this; }
+  im(): in DenseArrayBase<Real>[] { return EmptyReArray1D(base); }
+}
+
+view ImArray1D: RandomAccessible[] implements in DenseArrayBase<Real>[] {
+  getLen1(): Index { return len(base); }
+  access(i: Index): Real { return Im(base[i]); }
+  re(): in DenseArrayBase<Real>[] { return this; }
+  im(): in DenseArrayBase<Real>[] { return EmptyReArray1D(base); }
+}
+
+view UnitBeg: Iterable[] implements in Iterable<Value>[] {
+  getLen1(): Index { return len(base)+1; }
+
+  iterate(): range<Index, Value> {
+    yield 0, 1;
+    yield i+1, v forall i, v in base;
+  }
+
+  sparse(): range<Index, Value> {
+    yield 0, 1;
+    yield i+1, v forall i, v in base.sparse;
+  }
+}
+
+view UnitEnd: Iterable[] implements in Iterable<Value>[] {
+  getLen1(): Index { return len(base)+1; }
+
+  iterate(): range<Index, Value> {
+    yield i, v forall i, v in base;
+    yield len(base), 1;
+  }
+
+  sparse(): range<Index, Value> {
+    yield i, v forall i, v in base.sparse;
+    yield base.getLen1(), 1;
+  }
+}
+
+type UpperPackedDiagonal: PackedTriangleStorage implements DenseArrayBase<Value>[] {
+  parameter:
+  interface:
+    getLen1(): Index { return nBase; }
+    access(i: Index): &Value { return ApplyConj(data[(i*(i+3))/2]); }
+    re(): DenseArrayBase<Real>[] { return ReArray1D(this); }
+    im(): in DenseArrayBase<Real>[] { return ImArray1D(this); }
+}
+
+type LowerPackedDiagonal: PackedTriangleStorage implements DenseArrayBase<Value>[] {
+  parameter:
+  interface:
+    getLen1(): Index { return nBase; }
+    access(i: Index): &Value { return ApplyConj(data[(i*(2*nBase-i+1))/2]); }
+    re(): DenseArrayBase<Real>[] { return ReArray1D(this); }
+    im(): in DenseArrayBase<Real>[] { return ImArray1D(this); }
+}
+
+type UpPackedRow: PackedTriangleStorage implements DenseArrayBase<Value>[] {
+  parameter:
+    row: Index;
+    n: Index;
+    offset: Index;
+  interface:
+    getLen1(): Index { return n; }
+    re(): DenseArrayBase<Real>[] { return ReArray1D(this); }
+    im(): in DenseArrayBase<Real>[] { return ImArray1D(this); }
+
+    access(i: Index): &Value {
+      return ApplyConj(data[row + ((i+offset)*(i+offset+1))/2]);
+    }
+}
+
+type LowPackedRow: PackedTriangleStorage implements DenseArrayBase<Value>[] {
+  parameter:
+    row: Index;
+    n: Index;
+    offset: Index;
+  interface:
+    getLen1(): Index { return n; }
+    re(): DenseArrayBase<Real>[] { return ReArray1D(this); }
+    im(): in DenseArrayBase<Real>[] { return ImArray1D(this); }
+
+    access(i: Index): &Value {
+      return ApplyConj(data[row + ((i+offset)*(2*nBase-i-offset-1))/2]);
+    }
+}
+
+type FilledADiag: PlainMatrixStorage implements in Iterable<Value>[] {
+  parameter:
+    n: Index;
+    offset1: Index;
+    offset2: Index;
+    before: Index;
+    after: Index;
+  interface:
+    getLen1(): Index { return n; }
+
+    iterate(): range<Index, Value> {
+      yield i, 0 forall i in 0:before-1;
+      yield i+before, ApplyConj(data[offset1+i][offset2-i])
+        forall i in 0:n-before-after-1;
+      yield i, 0 forall i in n-after:n-1;
+    }
+
+    sparse(): range<Index, Value> {
+      yield i+before, ApplyConj(data[offset1+i][offset2-i])
+        forall i in 0:n-before-after-1;
+    }
+}
+
+type FilledRow: PlainMatrixStorage implements in Iterable<Value>[] {
+  parameter:
+    n: Index;
+    offset1: Index;
+    offset2: Index;
+    before: Index;
+    after: Index;
+  interface:
+    getLen1(): Index { return n; }
+
+    iterate(): range<Index, Value> {
+      yield i, 0 forall i in 0:before-1;
+      yield i, ApplyConj(data[offset1][offset2+i-before]) forall i in before:n-after-1;
+      yield i, 0 forall i in n-after:n-1;
+    }
+
+    sparse(): range<Index, Value> {
+      yield i, ApplyConj(data[offset1][offset2+i-before]) forall i in before:n-after-1;
+    }
+}

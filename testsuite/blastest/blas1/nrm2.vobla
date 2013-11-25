@@ -1,0 +1,37 @@
+/*
+ * Copyright (c) 2013-2014, ARM Limited
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+// returns |X|^2
+function nrm2(in X: Value[]): Real {
+  return sqrt(sum(Re(Xi)*Re(Xi) + Im(Xi)*Im(Xi) forall _, Xi in X.sparse));
+}
+
+export nrm2<Float>(X is          Column) as snrm2_n;
+export nrm2<Float>(X is Reversed Column) as snrm2_r;
+
+export nrm2<Double>(X is          Column) as dnrm2_n;
+export nrm2<Double>(X is Reversed Column) as dnrm2_r;
+
+export nrm2<Complex Float>(X is          Column) as scnrm2_n;
+export nrm2<Complex Float>(X is Reversed Column) as scnrm2_r;
+
+export nrm2<Complex Double>(X is          Column) as dznrm2_n;
+export nrm2<Complex Double>(X is Reversed Column) as dznrm2_r;

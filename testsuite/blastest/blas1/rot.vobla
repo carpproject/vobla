@@ -1,0 +1,44 @@
+/*
+ * Copyright (c) 2013-2014, ARM Limited
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+// Apply the plan rotation to row vector X and Y
+// [ x_i ]   [ c s ] [ x_i ]
+// [ y_i ] = [-s c ] [ y_i ]
+
+function rot(out X: Real[], out Y: Real[], c: Real, s: Real) {
+  forall(i, Xi in X) {
+    let x = Xi;
+    let y = Y[i];
+    Xi = c*x + s*y;
+    Y[i] = -s*x + c*y;
+  }
+}
+
+export rot<Float>(X is          Column, Y is          Column) as srot_nn;
+export rot<Float>(X is          Column, Y is Reversed Column) as srot_nr;
+export rot<Float>(X is Reversed Column, Y is          Column) as srot_rn;
+export rot<Float>(X is Reversed Column, Y is Reversed Column) as srot_rr;
+
+export rot<Double>(X is          Column, Y is          Column) as drot_nn;
+export rot<Double>(X is          Column, Y is Reversed Column) as drot_nr;
+export rot<Double>(X is Reversed Column, Y is          Column) as drot_rn;
+export rot<Double>(X is Reversed Column, Y is Reversed Column) as drot_rr;

@@ -1,0 +1,9 @@
+blas?/*.c
+blas?/*.c.base
+sparse/description/
+sparse/*.c
+spmvTest/*.in
+spmvTest/*.out
+spmvTest/*.matrix
+spmvTest/run
+spmvTest/prepare

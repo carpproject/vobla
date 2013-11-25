@@ -1,0 +1,82 @@
+/*
+ * Copyright (c) 2013-2014, ARM Limited
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+// A is an upper triangular matrix
+// if side == 0, computes B <- alpha*A*B
+// if side == 1, computes B <- alpha*B*A
+// if diag == 0, the diagonal of A is referenced
+// if diag == 1, the diagonal of A is not referenced and should be considered equal to 1
+
+function trmm(side: Index,
+              diag: Index,
+              alpha: Value,
+              in A: Value[][], // m*m or n*n
+              out B: Value[m][n]) {
+  if(diag == 1) {   // The diagonal is not referenced
+    if(side == 0) { // Computes B <- alpha*A*B
+      for(j in (B[0][*]).getRange()) {
+        B[i][j] = alpha*(B[i][j] + sum(A[i][k]*B[k][j] forall k in i+1:len(A, 1)-1))
+          forall i in (B[*][0]).getRange();
+      }
+    } else {        // Computes B <- alpha*B*A
+      for(j in 0:len(B, 2)-1 by -1) {
+        B[i][j] = alpha*(B[i][j] + sum(B[i][k]*A[k][j] forall k in 0:j-1))
+          forall i in (B[*][0]).getRange();
+      }
+    }
+  } else {          // The diagonal is referenced
+    if(side == 0) { // Computes B <- alpha*A*B
+      for(j in (B[0][*]).getRange()) {
+        B[i][j] = alpha*(sum(A[i][k]*B[k][j] forall k in i:len(A, 1)-1))
+          forall i in (B[*][0]).getRange();
+      }
+    } else {        // Computes B <- alpha*B*A
+      for(j in 0:len(B, 2)-1 by -1) {
+        B[i][j] = alpha*(sum(B[i][k]*A[k][j] forall k in 0:j))
+          forall i in (B[*][0]).getRange();
+      }
+    }
+  }
+}
+
+export trmm<Float>                                   as strmm_nn;
+export trmm<Float>(B is Transposed                 ) as strmm_nt;
+export trmm<Float>(A is Transposed                 ) as strmm_tn;
+export trmm<Float>(A is Transposed, B is Transposed) as strmm_tt;
+
+export trmm<Double>                                   as dtrmm_nn;
+export trmm<Double>(B is Transposed                 ) as dtrmm_nt;
+export trmm<Double>(A is Transposed                 ) as dtrmm_tn;
+export trmm<Double>(A is Transposed, B is Transposed) as dtrmm_tt;
+
+export trmm<Complex Float>                                              as ctrmm_nn;
+export trmm<Complex Float>(                            B is Transposed) as ctrmm_nt;
+export trmm<Complex Float>(A is            Transposed                 ) as ctrmm_tn;
+export trmm<Complex Float>(A is            Transposed, B is Transposed) as ctrmm_tt;
+export trmm<Complex Float>(A is Conjugated Transposed                 ) as ctrmm_un;
+export trmm<Complex Float>(A is Conjugated,            B is Transposed) as ctrmm_ct;
+
+export trmm<Complex Double>                                              as ztrmm_nn;
+export trmm<Complex Double>(                            B is Transposed) as ztrmm_nt;
+export trmm<Complex Double>(A is            Transposed                 ) as ztrmm_tn;
+export trmm<Complex Double>(A is            Transposed, B is Transposed) as ztrmm_tt;
+export trmm<Complex Double>(A is Conjugated Transposed                 ) as ztrmm_un;
+export trmm<Complex Double>(A is Conjugated,            B is Transposed) as ztrmm_ct;

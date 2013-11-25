@@ -1,0 +1,79 @@
+/*
+ * Copyright (c) 2013-2014, ARM Limited
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+storage Sell1Storage {
+  nRows: Index;
+  nCols: Index;
+  nNonZeros: Index;
+  sliceSize: Index;
+  colIdx: Index[nNonZeros];
+  slicePtr: Index[(nRows + sliceSize - 1)/sliceSize+1];
+  permutation: Index[(nRows + sliceSize - 1)/sliceSize][sliceSize];
+  data: Value[nNonZeros];
+}
+
+type Sell1: Sell1Storage implements SparseIterable<Value>[][] {
+  parameter:
+  interface:
+    getLen1(): Index { return nRows; }
+    getLen2(): Index { return nCols; }
+
+    sparseIterate(): range<Index, Index, &Value> {
+      let nSlices = (nRows + sliceSize - 1)/sliceSize;
+      forall(slice in 0:nSlices-1) {
+        let sliceBeg = slicePtr[slice];
+        let sliceEnd = slicePtr[slice+1];
+        forall(locRow in 0:sliceSize-1) {
+          yield permutation[slice][locRow], colIdx[i+locRow], data[i+locRow]
+            forall i in sliceBeg:sliceEnd-1;
+        }
+      }
+    }
+}
+
+storage Sell2Storage {
+  nRows: Index;
+  nCols: Index;
+  nNonZeros: Index;
+  nSlices: Index;
+  colIdx: Index[nNonZeros];
+  slicePtr: Index[2*(nSlices+1)];
+  permutation: Index[nRows];
+  data: Value[nNonZeros];
+}
+
+type Sell2: Sell2Storage implements SparseIterable<Value>[][] {
+  parameter:
+  interface:
+    getLen1(): Index { return nRows; }
+    getLen2(): Index { return nCols; }
+
+    sparseIterate(): range<Index, Index, &Value> {
+      forall(slice in 0: nSlices-1) {
+        let sliceBeg = slicePtr[2*slice];
+        let slicePos = slicePtr[2*slice+1];
+        let sliceEnd = slicePtr[2*slice+2];
+        let sliceSize = slicePtr[2*slice+3] - slicePos;
+        yield permutation[slicePos + locRow], colIdx[sliceBeg + i*sliceSize + locRow], data[sliceBeg + i*sliceSize +locRow]
+          forall i in 0:(sliceEnd-sliceBeg)/sliceSize-1, locRow in 0:sliceSize-1;
+      }
+    }
+}
