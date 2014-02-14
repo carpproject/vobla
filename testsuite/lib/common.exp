@@ -63,7 +63,7 @@ proc run_tool {tool name out args} {
     set expected $error
   }
 
-  spawn scala "$tool" -o "$out" "$args"
+  spawn "$tool" -o "$out" "$args"
 
   # Collect all output
   set lines {}

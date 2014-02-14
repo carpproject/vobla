@@ -401,6 +401,7 @@ private class FunctionTransformer(
             case _: Vobla.RealType => RealType
             case _: Vobla.ComplexType => ComplexType
             case _: Vobla.ValueType => ValueType
+            case _: Vobla.IndexType => IndexType
           }
           val convertedExp = !!(convertForCall)(expression, t)
           arglist += convertedExp.value

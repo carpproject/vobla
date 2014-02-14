@@ -34,17 +34,17 @@ BLAS1OBJS=rotg.o rot.o swap.o scal.o copy.o axpy.o dot.o nrm2.o asum.o amax.o
 BLAS2OBJS=gemv.o trmv.o trsv.o ger.o her.o her2.o syr.o syr2.o
 BLAS3OBJS=gemm.o syrk.o syr2k.o trmm.o trsm.o herk.o her2k.o
 
-TESTBLAS1OBJS=$(addprefix blas1/,$(BLAS1OBJS)) testfiles/common.o blas1/wrapper.o
-TESTBLAS2OBJS=$(addprefix blas2/,$(BLAS2OBJS)) testfiles/lsame.o testfiles/common.o blas2/wrapper.o
-TESTBLAS3OBJS=$(addprefix blas3/,$(BLAS3OBJS)) testfiles/lsame.o testfiles/common.o blas3/wrapper.o
+TESTBLAS1OBJS=$(addprefix blas1/,$(BLAS1OBJS)) testfiles/common.o blas1/wrapper.o blas1/pwrapper.o
+TESTBLAS2OBJS=$(addprefix blas2/,$(BLAS2OBJS)) testfiles/lsame.o testfiles/common.o blas2/wrapper.o blas2/pwrapper.o
+TESTBLAS3OBJS=$(addprefix blas3/,$(BLAS3OBJS)) testfiles/lsame.o testfiles/common.o blas3/wrapper.o blas3/pwrapper.o
 
 all: runtests
 
-blas1/wrapper.c: wrapper
+blas1/wrapper.c blas1/pwrapper.c: wrapper
 
-blas2/wrapper.c: wrapper
+blas2/wrapper.c blas2/pwrapper.c: wrapper
 
-blas3/wrapper.c: wrapper
+blas3/wrapper.c blas3/pwrapper.c: wrapper
 
 testfiles/testsblas1: $(TESTBLAS1OBJS) testfiles/sblat1.o
 	$(FC) $(FFLAGS) $^ $(LDFLAGS) -o $@
