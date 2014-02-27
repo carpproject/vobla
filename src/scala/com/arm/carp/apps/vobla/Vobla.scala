@@ -22,6 +22,7 @@
 
 package com.arm.carp.apps.vobla
 
+import com.arm.carp.apps.Version
 import com.arm.carp.pencil.Printer
 import java.io.PrintWriter
 import java.io.File
@@ -49,6 +50,8 @@ object Main {
       case Nil => inputFileName.isDefined
       case "-h" :: rest =>
         sayHelp(); false
+      case "--version" :: rest =>
+        sayVersion(); false
       case "-o" :: x :: rest =>
         outputFileName = Some(x); parseCommandLine(rest)
       case x :: rest => inputFileName = Some(x); parseCommandLine(rest)
@@ -57,6 +60,12 @@ object Main {
 
   private def sayHelp() {
     System.err.println("Usage: input-files [-o output-file]")
+    System.exit(0)
+  }
+
+  private def sayVersion() {
+    System.err.println("VOBLA Compiler")
+    System.err.println(Version.getFullVersionInfo)
     System.exit(0)
   }
 
