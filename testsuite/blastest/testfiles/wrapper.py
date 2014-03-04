@@ -140,8 +140,8 @@ def generateIncludes():
 def getArrayCases(args):
   aCasesOpt = []
   if 'triangular' in args:
-    # unit-triangular (d) or non-unit-triangular (n)
-    aCasesOpt.append('dn')
+    # unit-triangular (d) or non-unit-triangular (e)
+    aCasesOpt.append('de')
   if intersect(['AP', 'AT', 'ABT', 'CT'], args):
     # upper (u) or lower (l) triangular
     aCasesOpt.append('ul')
@@ -617,8 +617,9 @@ struct PackedTriangleView {
 def setArraysizeSign(size, case):
   """Replace occurrences of @SIGN@ with a minus if array is accessed in reverse."""
   for ac in case:
-    sign = '-' if ac == 'r' else ''
-    size = size.replace('@SIGN@', sign, 1)
+    if ac in ['r', 'n']:
+      sign = '-' if ac == 'r' else ''
+      size = size.replace('@SIGN@', sign, 1)
   return size
 
 def genPencilVectorView(arg, case, size):
