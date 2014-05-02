@@ -19,6 +19,7 @@
 # THE SOFTWARE
 
 import sys
+import re
 from optparse import OptionParser
 
 # Generate wrappers for a BLAS function: a C wrapper and multiple specialized
@@ -115,7 +116,7 @@ def isConstArrayArg(funcname, argname):
                        'B': ['rotg', 'trsm', 'trmm'],
                        'C': ['rotg', 'syrk', 'syr2k', 'herk', 'her2k', 'gemm'], \
                        'X': ['rot', 'swap', 'scal', 'trmv', 'trsv'], \
-                       'Y': ['rot', 'swap', 'copy', 'gemv', 'axpy']}
+                       'Y': ['rot', 'swap', 'copy', 'gemv', 'gbmv', 'axpy']}
   if funcname in nonConstArrayArgs[argname]:
     return False
   else:
@@ -250,7 +251,7 @@ def processArrayArg(name, dim, vType, arg2, arraySize, isConst):
     voblaCallArgs.append(viewName)
   optionalConst = 'const' if isConst == True else ''
   if dim == 'PackedTriangle':
-    voblaArgs.append(optionalConst + ' ' + vType + ' ' + name + '[]')
+    voblaArgs.append(optionalConst + ' ' + vType + ' ' + name + '[1]')
   else:
     voblaArgs.append(optionalConst + ' ' + vType + ' ' + name + gen2DArraySizeDeclFromView(name))
   voblaCallArgs.append(name)
@@ -271,17 +272,17 @@ def processRotgArg(wType):
   for name in 'abcs':
     processArrayArg(name, 'Vector', wType.valueType, '', '1', False)
 
-def processBandMatrixArg(wType):
-  processArrayArg('A', 'BandMatrix', wType.valueType, 'ld', ['1', '1'], True)
+def processBandMatrixArg(wType, n, name):
+  processArrayArg('A', 'BandMatrix', wType.valueType, 'ld', [n, 'ld'+name], True)
 
 def processTriangularMatrixArg(wType, n, name):
-  processArrayArg(name + 'T', 'Triangle', wType.valueType, 'ld', [n, n], True)
+  processArrayArg(name + 'T', 'Triangle', wType.valueType, 'ld', [n, 'ld'+name+'T'], True)
 
-def processTriangularBandMatrixArg(wType):
-  processArrayArg('ABT', 'BandTriangle', wType.valueType, 'ld', ['1', '1'], True)
+def processTriangularBandMatrixArg(wType, n):
+  processArrayArg('ABT', 'BandTriangle', wType.valueType, 'ld', [n, 'ldABT'], True)
 
-def processPackedMatrixArg(wType):
-  processArrayArg('AP', 'PackedTriangle', wType.valueType, '', [], True)
+def processPackedMatrixArg(wType, n):
+  processArrayArg('AP', 'PackedTriangle', wType.valueType, '', [n + '*(' + n + '+1)/2'], True)
 
 def initCall(name, returnType, typedName, args):
   call = '  '
@@ -443,26 +444,49 @@ def genWrapper(name, wType, level, args, mCases):
       processWrapperArg(a, wType.realType if isReal else wType.valueType, True)
     # Process arrays
     elif a in ['X', 'Y']:
-      size = sizeX if a in ['X'] else sizeY
+      if name in ['gemv', 'gbmv']:
+        size = '@DIMTRANS?' + sizeY + ':' + sizeX + '@' if a == 'X' else \
+               '@DIMTRANS?' + sizeX + ':' + sizeY + '@'
+      else:
+        size = sizeX if a in ['X'] else sizeY
       processArrayArg(a, 'Vector', wType.valueType, 'inc', [size, '@SIGN@inc' + a], isConstArrayArg(name, a))
     # Process matrices
     elif a in ['A', 'B', 'C']:
       nRow = k if a == 'B' else nRowA if a == 'A' else m
       nCol = nColA if a == 'A' else n
       if 't' + a not in args:
-        defaultTrans = 'tA' if a in ['B'] and name in ['syr2k', 'her2k'] else 'NOTRANS'
+        if a in ['A'] and name in ['ger', 'geru', 'gerc']:
+          defaultTrans = 'NOTRANS'
+          arraySize = [nCol, 'ld' + a]
+        elif a in ['B'] and name in ['syr2k', 'her2k']:
+          defaultTrans = 'tA'
+          arraySize = ['@DIMTRANS?' + nCol + ':' + nRow + '@', 'ld' + a]
+        elif a in ['B'] and name in ['symm', 'hemm', 'trsm', 'trmm']:
+          defaultTrans = 'NOTRANS'
+          arraySize = [nCol, 'ld' + a]
+        elif a in ['C'] and name in ['gemm', 'symm', 'hemm']:
+          defaultTrans = 'NOTRANS'
+          arraySize = [nCol, 'ld' + a]
+        else:
+          defaultTrans = 'NOTRANS'
+          arraySize = [nRow, 'ld' + a]
         body += '  int t' + a + ' = ' + defaultTrans + ';\n'
-      processArrayArg(a, 'Matrix', wType.valueType, 'ld', [nRow, nCol], isConstArrayArg(name, a))
+      elif a in ['A'] and name in ['gemv', 'gbmv']:
+        defaultTrans = 'NOTRANS'
+        arraySize = [nCol, 'ld' + a]
+      else:
+        arraySize = ['@DIMTRANS?' + nRow + ':' + nCol + '@', 'ld' + a]
+      processArrayArg(a, 'Matrix', wType.valueType, 'ld', arraySize, isConstArrayArg(name, a))
     elif a in ['AB']:
-      processBandMatrixArg(wType)
+      processBandMatrixArg(wType, n, 'A')
     elif a in['AP']:
-      processPackedMatrixArg(wType)
+      processPackedMatrixArg(wType, n)
     elif a in['AT']:
       processTriangularMatrixArg(wType, nRowA, 'A')
     elif a in['CT']:
       processTriangularMatrixArg(wType, n, 'C')
     elif a in['ABT']:
-      processTriangularBandMatrixArg(wType)
+      processTriangularBandMatrixArg(wType, n)
   # rotg is different from the rest
   if name == 'rotg':
     processRotgArg(wType)
@@ -498,7 +522,7 @@ def genWrapper(name, wType, level, args, mCases):
     for ac in aCases:
       arglist = ', '.join(pencilArgs)
       decl += fReturnType + ' ' + pencilFuncName + getCaseSuffix(mc, ac)
-      decl += '(' + setArraysizeSign(arglist, ac) + ');\n'
+      decl += '(' + substituteSizes(name, arglist, ac, mc) + ');\n'
       body += genSwitchCase(mc, ac, wType.isComplex, callBeg, callEnd)
   body += '  default:\n'
   body += '    fprintf(stderr, "Invalid case for ' + name + '");\n'
@@ -622,12 +646,34 @@ struct PackedTriangleView {
 """
   return s
 
+def substituteSizes(name, size, acases, mcases):
+  """Substitute all array and matrix size placeholders according to array and matrix cases."""
+  if name in ['gemv', 'gbmv']:
+    # Apply matrix case twice, as both vector arguments depend on a single transpose flag.
+    matrixCases = mcases + mcases
+  else:
+    matrixCases = mcases
+  size = setArraysizeSign(size, acases)
+  size = setMatrixSize(size, matrixCases)
+  return size
+
 def setArraysizeSign(size, case):
   """Replace occurrences of @SIGN@ with a minus if array is accessed in reverse."""
   for ac in case:
     if ac in ['r', 'n']:
       sign = '-' if ac == 'r' else ''
       size = size.replace('@SIGN@', sign, 1)
+  return size
+
+def setMatrixSize(size, trans):
+  """Replace occurrences of @DIMTRANS?x:y@ with either x or y, depending on the transpose flags."""
+  for mc in trans:
+    if mc in ['n', 'c']:
+      size = re.sub(r'@DIMTRANS\?([\w]+):([\w]+)@', r'\1', size, 1)
+    elif mc in ['t', 'u']:
+      size = re.sub(r'@DIMTRANS\?([\w]+):([\w]+)@', r'\2', size, 1)
+    else:
+      sys.exit('Unhandled matrix case ' + mc);
   return size
 
 def genPencilVectorView(arg, case, size):
@@ -714,7 +760,7 @@ def getPencilMatrixCase(name, mc, i):
   if name in ['symm', 'hemm', 'ger', 'geru', 'gerc']:
     # There is no user-visible transpose flag for these
     case = 't'
-  elif name in ['gemv', 'trmm', 'trsm']:
+  elif name in ['gemv', 'gbmv', 'trmm', 'trsm']:
     # Always transpose
     case = 't'
   elif i < len(mc):
@@ -752,8 +798,13 @@ def genPencilViews(name, level, args, mc, ac):
       views += genPencilVectorView(arg, ac[acIdx], size)
       acIdx += 1
     elif arg in ['A', 'B', 'C']:
-      nRows = k if arg == 'B' else nRowA if arg == 'A' else m
-      nCols = nColA if arg == 'A' else n
+      if name in ['syr2k', 'her2k'] and arg == 'B':
+        # B has same dimensionality as A for rank-2 functions.
+        nRows = nRowA
+        nCols = nColA
+      else:
+        nRows = k if arg == 'B' else nRowA if arg == 'A' else m
+        nCols = nColA if arg == 'A' else n
       views += genPencilMatrixView(arg, getPencilMatrixCase(name, mc, mcIdx), nRows, nCols)
       mcIdx += 1
     elif arg in ['AB']:
@@ -789,7 +840,7 @@ def genPencilWrapper(name, wType, level, args, mCases):
       prototypes += '(' + ', '.join(voblaArgsMap[wType.name]) + ');\n'
       arglist = ', '.join(pencilArgsMap[wType.name])
       pwrappers += fReturnType + ' pencil_' + funcname
-      pwrappers += '(' + setArraysizeSign(arglist, ac) + ') {\n'
+      pwrappers += '(' + substituteSizes(name, arglist, ac, mc) + ') {\n'
       pwrappers += '#pragma scop\n'
       pwrappers += '  {\n'
       pwrappers += genPencilViews(name, level, args, mc, ac)
