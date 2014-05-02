@@ -471,9 +471,9 @@ def genWrapper(name, wType, level, args, mCases):
   # Handle hermitian matrices
   if 'fillDiagIm' in args:
     body += '  for(int i=0; i<*n; i++) {\n'
-    for name in 'AC':
-      if name + 'T' in args:
-        body += '    ' + name + 'T[i*(1 + *ld' + name + 'T)].Im = 0;\n'
+    for a in 'AC':
+      if a + 'T' in args:
+        body += '    ' + a + 'T[i*(1 + *ld' + a + 'T)].Im = 0;\n'
     if 'AP' in args:
       body += '    if(uplo)\n'
       body += '      AP[(i*(2*(*n)-i+1))/2].Im = 0;\n'
