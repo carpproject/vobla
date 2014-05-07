@@ -135,7 +135,12 @@ def join(ins):
   return out
 
 def generateIncludes():
-  return '#include "common.h"\n'
+  return """#include <stdio.h>
+#include <stdlib.h>
+
+#include "common.h"
+
+"""
 
 def getArrayCases(args):
   aCasesOpt = []
@@ -495,6 +500,9 @@ def genWrapper(name, wType, level, args, mCases):
       decl += fReturnType + ' ' + pencilFuncName + getCaseSuffix(mc, ac)
       decl += '(' + setArraysizeSign(arglist, ac) + ');\n'
       body += genSwitchCase(mc, ac, wType.isComplex, callBeg, callEnd)
+  body += '  default:\n'
+  body += '    fprintf(stderr, "Invalid case for ' + name + '");\n'
+  body += '    exit(1);\n'
   body += '  }\n'
   wrapper = decl + wType.returnType + ' ' + wType.name + '_(' + ', '.join(cwrapArgs) + ') {\n'
   wrapper += body
