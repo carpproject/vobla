@@ -118,13 +118,13 @@ class StructProvider extends Transformer {
           case Some(s) => s
           case None =>
             val members = List.tabulate(baseDim)(i => ("base_size" + i, IndexType))
-            val s = Pencil.StructType(members , true, genStructName("ArrayBaseView"))
+            val s = Pencil.StructType(members , false, genStructName("ArrayBaseView"))
             baseArrayView += ((baseDim, s))
             s
         }
         val members = ("storage", baseStruct) :: (List.tabulate(viewDim)(i => ("view_size" + i, IndexType))
             ::: List.tabulate(baseDim)(i => ("offset" + i, IndexType)))
-        val s = use(Pencil.StructType(members, true, genStructName("ArrayView")))
+        val s = use(Pencil.StructType(members, false, genStructName("ArrayView")))
         arrayView += (((baseDim, viewDim), s))
         s
     }
