@@ -52,6 +52,7 @@ distclean: clean
 	rm -f config.status config.log vobla Makefile
 
 blas-check:
+	make -C testsuite/blastest/ blastestfiles
 	make -C testsuite/blastest/ PENCIL_HOME=${PENCIL_HOME}
 
 DOCS=${ALL}
