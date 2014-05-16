@@ -23,8 +23,8 @@
 
 <project name="antlr" default="dist" basedir=".">
     <property name="src" location="src"/>
-    <property name="pencil-src" location="pencil/src"/>
-    <property name="res" location="pencil/res"/>
+    <property name="pencil-src" location="${pencil-loc}/src"/>
+    <property name="res" location="${pencil-loc}/res"/>
     <property name="gen"  location="gen"/>
     <property name="name"  value="vobla"/>
     <property name="bin"  location="bin/${name}"/>

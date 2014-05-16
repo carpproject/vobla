@@ -27,10 +27,12 @@ export SCALA_HOME=@SCALA_HOME@
 export ANTLR_HOME=@ANTLR_HOME@
 export CLASSPATH=${ANTLR_HOME}/ant-antlr3.jar:${ANTLR_HOME}/antlr3.jar
 
+export PENCIL_HOME=@PENCILDIR@
+
 all: ${ALL}
 
 vobla:
-	ant dist
+	ant dist -Dpencil-loc=${PENCIL_HOME}
 
 check:${ALL:%=%-check} blas-check
 
@@ -41,7 +43,7 @@ clean:${ALL:%=%-clean} docs-clean blas-clean
 	echo ${CLEAN}
 
 vobla-clean:
-	ant -lib res/ant-antlr3.jar -Dname=vobla clean
+	ant clean -Dpencil-loc=${PENCIL_HOME}
 
 blas-clean:
 	make -C testsuite/blastest/ clean
@@ -50,7 +52,7 @@ distclean: clean
 	rm -f config.status config.log vobla Makefile
 
 blas-check:
-	make -C testsuite/blastest/
+	make -C testsuite/blastest/ PENCIL_HOME=${PENCIL_HOME}
 
 DOCS=${ALL}
 

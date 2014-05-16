@@ -45,12 +45,14 @@ AC_CHECK_FILE(["$ANTLR_HOME/antlr3.jar"],[],[AC_MSG_ERROR([could not find file])
 AC_CHECK_FILE(["$ANTLR_HOME/ant-antlr3.jar"],[],[AC_MSG_ERROR([could not find file])])
 
 dnl PENCIL
+AC_SUBST(PENCILDIR)
 AC_ARG_WITH([pencil],
   [AS_HELP_STRING([--with-pencil=dir],[directory containing PENCIL])],
   [PENCILDIR="$with_pencil"],
   [PENCILDIR="pencil"]
 )
 AC_CHECK_FILE(["$PENCILDIR/src"],[],[AC_MSG_ERROR([could not find pencil directory])])
+PENCILDIR=`readlink -f $PENCILDIR`
 
 dnl Automatically configure PENCIL dir if it is a subdir.
 dnl Also run autoconf in PENCIL dir if needed.
