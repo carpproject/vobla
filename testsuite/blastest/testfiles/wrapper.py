@@ -681,6 +681,30 @@ def setMatrixSize(size, trans):
       sys.exit('Unhandled matrix case ' + mc);
   return size
 
+def genAssume(expr):
+  return "  __pencil_assume(" + expr + ");\n"
+
+def genPencilAssumes(name, args):
+  """Generate PENCIL assume statements for the input arguments."""
+  assumes = ""
+  if 'n' in args:
+    assumes += genAssume("n > 0")
+  if 'm' in args:
+    assumes += genAssume("m > 0")
+  if 'k' in args:
+    assumes += genAssume("k >= 0")
+  if 'kl' in args:
+    assumes += genAssume("kl >= 0");
+  if 'ku' in args:
+    assumes += genAssume("ku >= 0");
+  if 'side' in args and name in ['trmm', 'trsm']:
+    assumes += genAssume("side >= 0");
+    assumes += genAssume("side <= 1");
+  if 'diag' in args and name in ['trmm', 'trsm']:
+    assumes += genAssume("diag >= 0");
+    assumes += genAssume("diag <= 1");
+  return assumes
+
 def genPencilVectorView(arg, case, size):
   viewname = arg + "_view"
   view = ''
@@ -848,6 +872,7 @@ def genPencilWrapper(name, wType, level, args, mCases):
       pwrappers += '(' + substituteSizes(name, arglist, ac, mc) + ') {\n'
       pwrappers += '#pragma scop\n'
       pwrappers += '  {\n'
+      pwrappers += genPencilAssumes(name, args)
       pwrappers += genPencilViews(name, level, args, mc, ac)
       # Generate call to VOBLA-generated PENCIL function
       pwrappers += '  '
