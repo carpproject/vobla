@@ -406,6 +406,11 @@ def genWrapper(name, wType, level, args, mCases):
     if wType.returnType != 'void':
       body += '  out'
     body += ';\n'
+  if 'm' in args:
+    body += '  if(*m == 0) return'
+    if wType.returnType != 'void':
+      body += '  out'
+    body += ';\n'
   if name == 'herk':
     body += '  if(*beta == 1.0 && (*alpha == 0.0 || *k == 0)) return;\n'
   if name == 'her2k':
