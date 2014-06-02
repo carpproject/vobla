@@ -211,6 +211,10 @@ def processWrapperArg(name, typ, isVoblaArg):
 
 def processArrayArg(name, dim, vType, arg2, arraySize, isConst):
   cwrapArgs.append(vType + ' *' + name)
+  if dim == 'PackedTriangle':
+    pencilArgs.append('int ' + arraySize[0])
+    pencilCallArgs.append('*n*(*n+1)/2')
+
   if arg2 != '':
     cwrapArgs.append('int *' + arg2 + name)
     pencilArgs.append('int ' + arg2 + name)
@@ -282,7 +286,7 @@ def processTriangularBandMatrixArg(wType, n):
   processArrayArg('ABT', 'BandTriangle', wType.valueType, 'ld', [n, 'ldABT'], True)
 
 def processPackedMatrixArg(wType, n):
-  processArrayArg('AP', 'PackedTriangle', wType.valueType, '', [n + '*(' + n + '+1)/2'], True)
+  processArrayArg('AP', 'PackedTriangle', wType.valueType, '', ['AP_size'], True)
 
 def initCall(name, returnType, typedName, args):
   call = '  '
@@ -703,6 +707,8 @@ def genPencilAssumes(name, args):
   if 'diag' in args and name in ['trmm', 'trsm']:
     assumes += genAssume("diag >= 0");
     assumes += genAssume("diag <= 1");
+  if 'AP' in args:
+    assumes += genAssume("AP_size > 0");
   return assumes
 
 def genPencilVectorView(arg, case, size):
