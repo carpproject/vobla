@@ -91,7 +91,7 @@ object Main {
     Checkable.walkProgram(lowered)
     val writer = new Printer
 
-    val code = writer.toPencil(pencil.get)
+    val code = writer.toPencil(pencil.get, true, true)
 
     outputFileName match {
       case Some(fname) =>
