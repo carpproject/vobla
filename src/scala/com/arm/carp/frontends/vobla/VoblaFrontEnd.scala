@@ -36,7 +36,7 @@ import scala.collection.mutable.ArrayBuffer
 class UserError(val message: String) extends Throwable
 case class HandledError() extends Throwable
 
-class VoblaFrontEnd {
+class VoblaFrontEnd(importPaths: List[String]) {
 
   private val files = HashMap[String, Vobla.Program]()
 
@@ -60,17 +60,23 @@ class VoblaFrontEnd {
     }
   }
 
-  private def parseFile(branch: Set[String])(file: String): Vobla.Program = {
-    val f = new File(file)
-    if (!f.exists())
-      throw new UserError("File " + file + " not found")
-    val path = f.getCanonicalPath()
+  private def findFileInPaths(file: String): Option[File] = {
+    val files: List[File] = importPaths.map(f => new File(f + file))
+    files find (_.exists())
+  }
+
+  private def parseFile(branch: Set[String])(filename: String): Vobla.Program = {
+    val file = findFileInPaths(filename) match {
+      case Some(x) => x
+      case None => throw new UserError("File " + filename + " not found")
+    }
+    val path = file.getCanonicalPath()
     if(branch.contains(path))
-      throw new UserError("File " + file + " depends on itself for import")
+      throw new UserError("File " + filename + " depends on itself for import")
     files.get(path) match {
       case Some(f) => f
       case None =>
-        val input = new ANTLRFileStream(file)
+        val input = new ANTLRFileStream(file.getPath())
         val lexer = new voblaLexer(input)
         val tokens = new CommonTokenStream(lexer)
         val parser = new voblaParser(tokens)
@@ -103,7 +109,7 @@ class VoblaFrontEnd {
         val duplicateNames = names.diff(names.distinct)
         if(!duplicateNames.isEmpty)
           throw new UserError("In file " + path + ", " + duplicateNames.head + " is imported twice")
-        val typer = new Typer(file, funs, storages, interfaces, types, views)
+        val typer = new Typer(filename, funs, storages, interfaces, types, views)
         val p = typer.typeVoblaProgram(ast)
         files += ((path, p))
         p

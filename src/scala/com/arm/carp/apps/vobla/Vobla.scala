@@ -29,6 +29,7 @@ import java.io.File
 import com.arm.carp.frontends.vobla.VoblaFrontEnd
 import com.arm.carp.pencil.Checkable
 import com.arm.carp.pencil.Lowering
+import scala.collection.mutable.ListBuffer
 
 /**
   * VOBLA-to-PENCIL compiler driver.
@@ -39,6 +40,7 @@ object Main {
 
   var inputFileName: Option[String] = None
   var outputFileName: Option[String] = None
+  private var importPaths = new ListBuffer[String]
 
   /**
    * Parse command line arguments.
@@ -52,6 +54,8 @@ object Main {
         sayHelp(); false
       case "--version" :: rest =>
         sayVersion(); false
+      case "-I" :: x :: rest =>
+        importPaths += x; parseCommandLine(rest)
       case "-o" :: x :: rest =>
         outputFileName = Some(x); parseCommandLine(rest)
       case x :: rest => inputFileName = Some(x); parseCommandLine(rest)
@@ -59,7 +63,7 @@ object Main {
   }
 
   private def sayHelp() {
-    System.err.println("Usage: input-files [-o output-file]")
+    System.err.println("Usage: input-files [-I import-path] [-o output-file]")
     System.exit(0)
   }
 
@@ -74,12 +78,25 @@ object Main {
     System.exit(-1)
   }
 
+  /**
+   * Add the current directory as the first path to be searched, add a
+   * file/directory separator to the paths that lack it, and then return
+   * a list of import paths.
+   */
+  private def getImportPaths(): List[String] = {
+    "./" +=: importPaths
+    importPaths.toList map(s =>
+      if (s endsWith File.separator) s
+      else s + File.separator
+    )
+  }
+
   def main(args: Array[String]) {
     if (parseCommandLine(args.toList) != true) {
       complain("Invalid command line arguments (use -h for help).")
     }
 
-    val frontend = new VoblaFrontEnd
+    val frontend = new VoblaFrontEnd(getImportPaths)
     val pencil = frontend.parse(inputFileName.get)
 
     if (pencil.isEmpty) {
