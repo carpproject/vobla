@@ -75,5 +75,7 @@ AC_CHECK_FILE(["$PENCIL_OPTIMIZER"],[],[AC_MSG_ERROR([could not find pencil-opti
 PENCIL_OPTIMIZER=`readlink -f $PENCIL_OPTIMIZER`
 
 AC_CONFIG_FILES([vobla], [chmod +x vobla])
+AC_CONFIG_FILES([global-vobla], [chmod +x global-vobla])
+AC_CONFIG_FILES([packages/ebuild/app-misc/vobla/vobla-9999.ebuild])
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

@@ -1,0 +1,9 @@
+Package: vobla
+Version: 1.1-1
+Section: base
+Priority: optional
+Architecture: all
+Depends:
+Maintainer: Alexey Kravets <Alexey.Kravets@arm.com>
+Description: VOBLA compiler developed within CARP project
+

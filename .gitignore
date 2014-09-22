@@ -20,3 +20,9 @@ config.status
 configure
 /Makefile
 /pencil
+/global-vobla
+*.deb
+*.rpm
+/work
+/packages/ebuild/app-misc/vobla/vobla-9999.ebuild
+vobla-9999.ebuild

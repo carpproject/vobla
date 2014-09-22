@@ -79,4 +79,14 @@ docs-clean:${DOCS:%=%-docs-clean}
 %-docs-clean:
 	rm -rf "docs/$*/*"
 
+.PHONY: packages
+packages:
+	fakeroot ./create-packages.sh
+
+install:
+	mkdir -p ${JAR_ROOT}
+	mkdir -p ${BIN_ROOT}
+	cp vobla.jar ${JAR_ROOT}
+	cp global-vobla ${BIN_ROOT}/vobla
+
 .PHONY: ${ALL}
