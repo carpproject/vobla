@@ -44,22 +44,35 @@ AC_ARG_WITH([antlr3],
 AC_CHECK_FILE(["$ANTLR_HOME/antlr3.jar"],[],[AC_MSG_ERROR([could not find file])])
 AC_CHECK_FILE(["$ANTLR_HOME/ant-antlr3.jar"],[],[AC_MSG_ERROR([could not find file])])
 
-dnl PENCIL
-AC_SUBST(PENCILDIR)
+dnl PENCIL lib jar
+AC_SUBST(PENCIL_JAR)
 AC_ARG_WITH([pencil],
-  [AS_HELP_STRING([--with-pencil=dir],[directory containing PENCIL])],
-  [PENCILDIR="$with_pencil"],
-  [PENCILDIR="pencil"]
+  [AS_HELP_STRING([--with-pencil=dir],[pencil.jar file])],
+  [PENCIL_JAR="$with_pencil"],
+  [PENCIL_JAR="/usr/local/share/pencil/pencil.jar"]
 )
-AC_CHECK_FILE(["$PENCILDIR/src"],[],[AC_MSG_ERROR([could not find pencil directory])])
-PENCILDIR=`readlink -f $PENCILDIR`
+AC_CHECK_FILE(["$PENCIL_JAR"],[],[AC_MSG_ERROR([could not find pencil.jar])])
+PENCIL_JAR=`readlink -f $PENCIL_JAR`
 
-dnl Automatically configure PENCIL dir if it is a subdir.
-dnl Also run autoconf in PENCIL dir if needed.
-if test "x$PENCILDIR" = "xpencil"; then
-  AC_CHECK_FILE(["$PENCILDIR/configure"],[],[cd "$PENCILDIR" && autoconf && cd ..])
-  AC_CONFIG_SUBDIRS(pencil)
-fi
+dnl PENCIL linker app
+AC_SUBST(PENCIL_LINKER)
+AC_ARG_WITH([pencil-linker],
+  [AS_HELP_STRING([--with-pencil-linker=program],[pencil-linker to use])],
+  [PENCIL_LINKER="$with_pencil_linker"],
+  [PENCIL_LINKER=`which pencil-linker`]
+)
+AC_CHECK_FILE(["$PENCIL_LINKER"],[],[AC_MSG_ERROR([could not find pencil-linker])])
+PENCIL_LINKER=`readlink -f $PENCIL_LINKER`
+
+dnl PENCIL optimizer app
+AC_SUBST(PENCIL_OPTIMIZER)
+AC_ARG_WITH([pencil-optimizer],
+  [AS_HELP_STRING([--with-pencil-optimizer=program],[pencil-optimizer to use])],
+  [PENCIL_OPTIMIZER="$with_pencil_optimizer"],
+  [PENCIL_OPTIMIZER=`which pencil-optimizer`]
+)
+AC_CHECK_FILE(["$PENCIL_OPTIMIZER"],[],[AC_MSG_ERROR([could not find pencil-optimizer])])
+PENCIL_OPTIMIZER=`readlink -f $PENCIL_OPTIMIZER`
 
 AC_CONFIG_FILES([vobla], [chmod +x vobla])
 AC_CONFIG_FILES([Makefile])

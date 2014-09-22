@@ -27,12 +27,20 @@ export SCALA_HOME=@SCALA_HOME@
 export ANTLR_HOME=@ANTLR_HOME@
 export CLASSPATH=${ANTLR_HOME}/ant-antlr3.jar:${ANTLR_HOME}/antlr3.jar
 
-export PENCIL_HOME=@PENCILDIR@
+export PENCIL_JAR=@PENCIL_JAR@
+
+export PENCIL_OPTIMIZER=@PENCIL_OPTIMIZER@
+export PENCIL_LINKER=@PENCIL_LINKER@
+
+export G_PREFIX=${PREFIX}/usr/local
+
+JAR_ROOT=${G_PREFIX}/share/pencil
+BIN_ROOT=${G_PREFIX}/bin/
 
 all: ${ALL}
 
 vobla:
-	ant dist -Dpencil-loc=${PENCIL_HOME}
+	ant dist -Dpencil-loc=${PENCIL_JAR}
 
 check:${ALL:%=%-check} blas-check
 
@@ -43,7 +51,7 @@ clean:${ALL:%=%-clean} docs-clean blas-clean
 	echo ${CLEAN}
 
 vobla-clean:
-	ant clean -Dpencil-loc=${PENCIL_HOME}
+	ant clean
 
 blas-clean:
 	make -C testsuite/blastest/ clean
@@ -53,7 +61,7 @@ distclean: clean
 
 blas-check:
 	make -C testsuite/blastest/ blastestfiles
-	make -C testsuite/blastest/ PENCIL_HOME=${PENCIL_HOME}
+	make -C testsuite/blastest/ PENCIL_LINKER=${PENCIL_LINKER} PENCIL_OPTIMIZER=${PENCIL_OPTIMIZER}
 
 DOCS=${ALL}
 
