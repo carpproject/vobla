@@ -47,32 +47,44 @@ AC_CHECK_FILE(["$ANTLR_HOME/ant-antlr3.jar"],[],[AC_MSG_ERROR([could not find fi
 dnl PENCIL lib jar
 AC_SUBST(PENCIL_JAR)
 AC_ARG_WITH([pencil],
-  [AS_HELP_STRING([--with-pencil=dir],[pencil.jar file])],
+  [AS_HELP_STRING([--with-pencil=file],[pencil.jar file])],
   [PENCIL_JAR="$with_pencil"],
   [PENCIL_JAR="/usr/local/share/pencil/pencil.jar"]
 )
-AC_CHECK_FILE(["$PENCIL_JAR"],[],[AC_MSG_ERROR([could not find pencil.jar])])
 PENCIL_JAR=`readlink -f $PENCIL_JAR`
+AC_CHECK_FILE(["$PENCIL_JAR"],[],[AC_MSG_ERROR([could not find pencil.jar])])
 
-dnl PENCIL linker app
+dnl Use PENCIL linker provided via --with-... flag, or fall back to first one in PATH.
+OLDPATH=$PATH
 AC_SUBST(PENCIL_LINKER)
 AC_ARG_WITH([pencil-linker],
   [AS_HELP_STRING([--with-pencil-linker=program],[pencil-linker to use])],
-  [PENCIL_LINKER="$with_pencil_linker"],
-  [PENCIL_LINKER=`which pencil-linker`]
+  [
+    abspath="`readlink -f $with_pencil_linker`"
+    PATH="`dirname $abspath`:$PATH"
+    PENCIL_LINKER_NAME="`basename $with_pencil_linker`"
+  ],
+  [PENCIL_LINKER_NAME="pencil-linker"]
 )
-AC_CHECK_FILE(["$PENCIL_LINKER"],[],[AC_MSG_ERROR([could not find pencil-linker])])
-PENCIL_LINKER=`readlink -f $PENCIL_LINKER`
+AC_PATH_PROG([PENCIL_LINKER], $PENCIL_LINKER_NAME)
+AS_IF([test ! -x "$PENCIL_LINKER"], [AC_MSG_ERROR([could not find pencil-linker])])
+PATH=$OLDPATH
 
-dnl PENCIL optimizer app
+dnl Use PENCIL optimizer provided via --with-... flag, or fall back to first one in PATH.
+OLDPATH=$PATH
 AC_SUBST(PENCIL_OPTIMIZER)
 AC_ARG_WITH([pencil-optimizer],
   [AS_HELP_STRING([--with-pencil-optimizer=program],[pencil-optimizer to use])],
-  [PENCIL_OPTIMIZER="$with_pencil_optimizer"],
-  [PENCIL_OPTIMIZER=`which pencil-optimizer`]
+  [
+    abspath="`readlink -f $with_pencil_optimizer`"
+    PATH="`dirname $abspath`:$PATH"
+    PENCIL_OPTIMIZER_NAME="`basename $with_pencil_optimizer`"
+  ],
+  [PENCIL_OPTIMIZER_NAME="pencil-optimizer"]
 )
-AC_CHECK_FILE(["$PENCIL_OPTIMIZER"],[],[AC_MSG_ERROR([could not find pencil-optimizer])])
-PENCIL_OPTIMIZER=`readlink -f $PENCIL_OPTIMIZER`
+AC_PATH_PROG([PENCIL_OPTIMIZER], $PENCIL_OPTIMIZER_NAME)
+AS_IF([test ! -x "$PENCIL_OPTIMIZER"], [AC_MSG_ERROR([could not find pencil-optimizer])])
+PATH=$OLDPATH
 
 AC_CONFIG_FILES([vobla], [chmod +x vobla])
 AC_CONFIG_FILES([global-vobla], [chmod +x global-vobla])
