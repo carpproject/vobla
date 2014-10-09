@@ -30,15 +30,11 @@ Building process
 Summary:
 
 autoconf
-./configure --with-scala=$SCALA_HOME --with-antlr3=$ANTLR_HOME
+./configure --with-scala=$SCALA_HOME --with-antlr3=$ANTLR_HOME --with-pencil=$PENCIL_HOME/pencil.jar --with-pencil-linker=$PENCIL_HOME/linker --with-pencil-optimizer=$PENCIL_HOME/optimizer
 make
 
-For more information on what $SCALA_HOME and $ANTLR_HOME should point to,
-refer to 'Build requirements' below.
-
-If a pencil/ subdirectory exists, the configure step will automatically
-run configure in that directory as well with the same arguments.
-
+For more information on what $SCALA_HOME, $ANTLR_HOME and $PENCIL_HOME should
+point to, refer to 'Build requirements' below.
 
 Build requirements
 ------------------
@@ -72,11 +68,11 @@ Build requirements
      typesafe-config.jar
   * Antlr3 tools are accessible via CLASSPATH:
     % export CLASSPATH=$ANTLR_HOME/ant-antlr3.jar:$ANTLR_HOME/antlr3.jar
-  * PENCIL core repository is cloned (as submodule, for example) to ./pencil directory.
-    % ls
-    build.xml  docs/  etc/  grammar/  Makefile  pencil  README  src/  testsuite/  vobla.doxygen
   * For BLAS testing BLAS testsuite must be downloaded:
     make -C testsuite/blastest/ blastestfiles
+  * PENCIL library is installed:
+    % git clone git@github.com:carpproject/pencil.git $PENCIL_HOME
+    Build the library by following instructions in the README.txt
 
 This build has been tested on the following configuration:
  % scalac -version
