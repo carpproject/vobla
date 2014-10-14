@@ -25,9 +25,7 @@ scriptpath="`dirname $script`"
 
 voblajar="$scriptpath/vobla.jar"
 
-SCALA_HOME=@SCALA_HOME@
-ANTLR_HOME=@ANTLR_HOME@
 PENCIL_JAR=@PENCIL_JAR@
-export CLASSPATH=$ANTLR_HOME/ant-antlr3.jar:$ANTLR_HOME/antlr3.jar:${PENCIL_JAR}
+export CLASSPATH=@ANT_ANTLR_HOME@/ant-antlr3.jar:@ANTLR_HOME@/antlr3.jar:${PENCIL_JAR}
 
-$SCALA_HOME/bin/scala "$voblajar" "$@"
+@SCALA_RUNTIME@  "$voblajar" "$@"

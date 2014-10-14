@@ -30,4 +30,4 @@ voblajar="${JAR_PREFIX}/vobla.jar"
 PENCIL_JAR=@PENCIL_JAR@
 export CLASSPATH=${CLASSPATH}:${PENCIL_JAR}
 
-scala "$voblajar" "$@"
+@SCALA_RUNTIME@ "$voblajar" "$@"

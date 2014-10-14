@@ -25,14 +25,15 @@ SCALADOC=scaladoc
 
 export SCALA_HOME=@SCALA_HOME@
 export ANTLR_HOME=@ANTLR_HOME@
-export CLASSPATH=${ANTLR_HOME}/ant-antlr3.jar:${ANTLR_HOME}/antlr3.jar
+export ANT_ANTLR_HOME=@ANT_ANTLR_HOME@
+export CLASSPATH=${ANT_ANTLR_HOME}/ant-antlr3.jar:${ANTLR_HOME}/antlr3.jar
 
 export PENCIL_JAR=@PENCIL_JAR@
 
 export PENCIL_OPTIMIZER=@PENCIL_OPTIMIZER@
 export PENCIL_LINKER=@PENCIL_LINKER@
 
-export G_PREFIX=${PREFIX}/usr/local
+export G_PREFIX=${PREFIX}/@prefix@
 
 JAR_ROOT=${G_PREFIX}/share/pencil
 BIN_ROOT=${G_PREFIX}/bin/

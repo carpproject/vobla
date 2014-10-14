@@ -36,12 +36,23 @@ SLOT="0"
 DEPEND="app-misc/pencil-tools"
 RDEPEND=${DEPEND}
 
+get_antlr() {
+    ANTLR_HOME=`readlink -f $1`
+    mkdir -p $ANTLR_HOME
+    wget http://www.antlr3.org/download/antlr-3.5.2-complete-no-st3.jar -O $ANTLR_HOME/antlr3.jar
+    wget http://www.antlr3.org/share/1169924912745/antlr3-task.zip -O `pwd`/antlr3-task.zip
+    unzip `pwd`/antlr3-task.zip -d `pwd`/antlr3-task
+    cp `pwd`/antlr3-task/antlr3-task/ant-antlr3.jar $ANTLR_HOME/ant-antlr3.jar
+    rm -rf `pwd`/antlr3-task `pwd`/antlr3-task.zip
+}
+
 src_prepare() {
-    eautoconf
+    get_antlr $ANTLR_TMP_NAME
+    autoconf
 }
 
 src_configure() {
-    econf --with-scala=@SCALA_HOME@ --with-antlr3=@ANTLR_HOME@ --with-prefix=@JAR_PREFIX@
+    econf --with-antlr3=$ANTLR_TMP_NAME --with-pencil=/usr/share/pencil/pencil.jar
 }
 
 src_install() {
