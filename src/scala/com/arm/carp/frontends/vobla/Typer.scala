@@ -26,7 +26,6 @@ import com.arm.carp.frontends.vobla.Ast._
 import com.arm.carp.{ vobla => Vobla }
 import com.arm.carp.vobla.ComparisonOp.ComparisonOp
 import com.arm.carp.pencil.Assertable
-import com.arm.carp.pencil.BuiltIn
 import com.arm.carp.pencil.Common
 import org.antlr.runtime.tree.Tree
 import scala.collection.mutable.HashSet
@@ -51,7 +50,6 @@ class Typer(
   // To keep track of global objects
   private val localNames = HashSet[Object]()
   private val exportNames = HashMap[String, () => Vobla.FunctionVersion]()
-  private val intrinsics = BuiltIn.function
 
   private def addInterface(i: Vobla.Interface) = interfaces += (((i.name, i.dim), i))
 
@@ -565,6 +563,10 @@ class Typer(
       throw new TypeError(i, tree)
   }
 
+  private def isValidIntrinsic(name: String) = BuiltIn.functions.contains(name)
+
+  private def getIntrinsicNArgs(name: String) = BuiltIn.functions(name)._1
+
   private def expression(env: Environment)(ast: Ast): Vobla.Expression = ast match {
     case MultExpression(e0, e1, _) =>
       val exp0 = expression(env)(e0)
@@ -583,9 +585,9 @@ class Typer(
         case (_, t1) => throw TypeError(t1, e1.tree)
       }
     case Call(name, argsAst, t) if !env.isMemberSize =>
-      if(intrinsics.contains(name.text)) {
+      if(isValidIntrinsic(name.text)) {
          val args = argsAst.map(checkExpType(env)(t => t.isInstanceOf[Vobla.IndexType] || t.isInstanceOf[Vobla.RealType], _))
-         if(!(args.size == intrinsics(name.text))) throw new TypingError("Bad number of arguments", t)
+         if(!(args.size == getIntrinsicNArgs(name.text))) throw new TypingError("Bad number of arguments", t)
         Vobla.IntrinsicCallExpression(name.text, args)
       }
       else if(env.isMethod && !env.isView && types.contains(name.text)) {

@@ -30,7 +30,7 @@ export CLASSPATH=${ANT_ANTLR_HOME}/ant-antlr3.jar:${ANTLR_HOME}/antlr3.jar
 
 export PENCIL_JAR=@PENCIL_JAR@
 
-export PENCIL_OPTIMIZER=@PENCIL_OPTIMIZER@
+export PENCIL_OPTIMIZER="@PENCIL_OPTIMIZER@ --include ../pencil.h"
 export PENCIL_LINKER=@PENCIL_LINKER@
 
 export G_PREFIX=${PREFIX}/@prefix@
@@ -61,6 +61,7 @@ distclean: clean
 	rm -f config.status config.log vobla Makefile
 
 blas-check:
+	cpp -P -D__PENCIL__ @PENCIL_UTILS@/include/pencil.h -o testsuite/pencil.h
 	make -C testsuite/blastest/ blastestfiles
 	make -C testsuite/blastest/ PENCIL_LINKER=${PENCIL_LINKER} PENCIL_OPTIMIZER=${PENCIL_OPTIMIZER}
 

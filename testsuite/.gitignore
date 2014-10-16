@@ -10,3 +10,4 @@ DBLAT*
 test*blas*
 blastest/output/
 code/pencil/*/*.c
+/pencil.h

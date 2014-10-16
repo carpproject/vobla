@@ -45,6 +45,34 @@ private class FunctionTransformer(
 
   type YieldCallback = List[View] => Pencil.Operation
 
+  private def createFunctionForIntrinsic(name: String, stype: Pencil.ScalarType, nargs: Int) = {
+    val params = for (_ <- 1 to nargs) yield Pencil.ScalarVariableDef(stype, "param", None)
+    new Pencil.Function(name, params, None, stype, None, false, false, false)
+  }
+
+  private def toPencilCallInt(vname: String) = {
+    val name = BuiltIn.functions(vname)._2
+    val stype = IndexType
+    val nargs = BuiltIn.functions(vname)._1
+    createFunctionForIntrinsic(name, stype, nargs)
+  }
+
+  private def toPencilCallReal(vname: String) = {
+    val stype = RealType
+    val name = if (stype.bits == 32) BuiltIn.functions(vname)._3 else BuiltIn.functions(vname)._4
+    val nargs = BuiltIn.functions(vname)._1
+    createFunctionForIntrinsic(name, stype, nargs)
+  }
+
+  private val intrinsics = BuiltIn.functions.keys map (vname => vname -> (toPencilCallInt(vname), toPencilCallReal(vname))) toMap
+
+  def toPencilCall(name: String, args: Seq[Pencil.Expression]) = {
+    val integer = args.head.expType.isInt
+    val function = if (integer) intrinsics(name)._1 else intrinsics(name)._2
+    new Pencil.CallExpression(function, args)
+  }
+
+
   private def rotate[T] = (_: List[T]) match {
     case h :: q => q ::: List(h)
     case List() => List()
@@ -381,8 +409,8 @@ private class FunctionTransformer(
     baseView.copy(sizes = sizes(baseView.sizes), offsets = newOffsets, factors = newFactors)
   }
 
-  private val transformDiag = extractArrayView(2, List(List(1, 1)), s => List(Pencil.IntrinsicCallExpression("min", s)))_
-  private val transformAntiDiag = extractArrayView(2, List(List(1, -1)), s => List(Pencil.IntrinsicCallExpression("min", s)))_
+  private val transformDiag = extractArrayView(2, List(List(1, 1)), s => List(toPencilCall("min", s)))_
+  private val transformAntiDiag = extractArrayView(2, List(List(1, -1)), s => List(toPencilCall("min", s)))_
   private val transformTransposed = extractArrayView(2, List(List(0, 1), List(1, 0)), s => s.reverse)_
   private val transformReveresed = extractArrayView(1, List(List(-1)), s => s)_
   private val transformArrayConj = (baseView: ArrayView) => baseView.copy(conjugated = true)
@@ -431,14 +459,9 @@ private class FunctionTransformer(
 
   private def transformIntrinsicCall(call: Vobla.IntrinsicCallExpression) = {
     val argList = call.args.map(transformScalarExpression(_))
-    val name = (call.name, call.args(0).expType) match {
-      case ("min", _: Vobla.RealType) => "fmin"
-      case ("max", _: Vobla.RealType) => "fmax"
-      case ("abs", _: Vobla.RealType) => "fabs"
-      case (s, _) => s
-    }
+    val name = call.name
     val argValues = argList.map(!!((a: ScalarView) => a.value))
-    !!((l: List[Pencil.ScalarExpression]) => ScalarView(Pencil.IntrinsicCallExpression(name, l)))(argValues)
+    !!((l: List[Pencil.ScalarExpression]) => ScalarView(toPencilCall(name, l)))(argValues)
   }
 
   private def getFunction(version: Vobla.FunctionVersion) = functionVersions.get(version) match {

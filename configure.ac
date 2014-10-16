@@ -50,6 +50,15 @@ AC_ARG_WITH([antlr3],
 )
 AC_CHECK_FILE(["$ANTLR_HOME/antlr3.jar"],[],[AC_MSG_ERROR([could not find file])])
 
+dnl pencil utils dir
+AC_SUBST(PENCIL_UTILS)
+AC_ARG_WITH([pencil-utils],
+  [AS_HELP_STRING([--with-pencil-utils=dir],[directory containing pencil-utils])],
+  [PENCIL_UTILS="$with_pencil_utils"],
+  [AC_MSG_ERROR([please specify path to pencil utils using --with-pencil-utils])]
+)
+AC_CHECK_FILE(["$PENCIL_UTILS/include/pencil.h"],[],[AC_MSG_ERROR([could not find file])])
+
 dnl ant-antlr3 jar
 AC_SUBST(ANT_ANTLR_HOME)
 AC_ARG_WITH([ant-antlr3],
