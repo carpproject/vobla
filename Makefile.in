@@ -32,6 +32,7 @@ export PENCIL_JAR=@PENCIL_JAR@
 
 export PENCIL_OPTIMIZER="@PENCIL_OPTIMIZER@ --include ../pencil.h"
 export PENCIL_LINKER=@PENCIL_LINKER@
+export PENCIL_UTIL=@PENCIL_UTIL@
 
 export G_PREFIX=${PREFIX}/@prefix@
 
@@ -61,9 +62,14 @@ distclean: clean
 	rm -f config.status config.log vobla Makefile
 
 blas-check:
-	cpp -P -D__PENCIL__ @PENCIL_UTILS@/include/pencil.h -o testsuite/pencil.h
+ifneq ($(PENCIL_UTIL),)
+	cpp -P -D__PENCIL__ ${PENCIL_UTIL}/include/pencil.h -o testsuite/pencil.h
 	make -C testsuite/blastest/ blastestfiles
 	make -C testsuite/blastest/ PENCIL_LINKER=${PENCIL_LINKER} PENCIL_OPTIMIZER=${PENCIL_OPTIMIZER}
+else
+	@echo "Path to pencil-util not provided during configuration."
+	@echo "Use --with-pencil-util=/path/to/pencil-util/ to enable the BLAS testsuite."
+endif
 
 DOCS=${ALL}
 

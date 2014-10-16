@@ -50,14 +50,20 @@ AC_ARG_WITH([antlr3],
 )
 AC_CHECK_FILE(["$ANTLR_HOME/antlr3.jar"],[],[AC_MSG_ERROR([could not find file])])
 
-dnl pencil utils dir
-AC_SUBST(PENCIL_UTILS)
-AC_ARG_WITH([pencil-utils],
-  [AS_HELP_STRING([--with-pencil-utils=dir],[directory containing pencil-utils])],
-  [PENCIL_UTILS="$with_pencil_utils"],
-  [AC_MSG_ERROR([please specify path to pencil utils using --with-pencil-utils])]
+dnl pencil util dir
+AC_SUBST(PENCIL_UTIL)
+AC_ARG_WITH([pencil-util],
+  [AS_HELP_STRING([--with-pencil-util=dir],[directory containing pencil-util])],
+  [PENCIL_UTIL="$with_pencil_util"],
+  [
+   AC_MSG_WARN([pencil-util directory not found, BLAS testsuite will not be run.])
+   PENCIL_UTIL=""
+  ]
 )
-AC_CHECK_FILE(["$PENCIL_UTILS/include/pencil.h"],[],[AC_MSG_ERROR([could not find file])])
+if test "x$PENCIL_UTIL" != "x"
+then
+    AC_CHECK_FILE(["$PENCIL_UTIL/include/pencil.h"],[],[AC_MSG_ERROR([could not find file])])
+fi
 
 dnl ant-antlr3 jar
 AC_SUBST(ANT_ANTLR_HOME)
