@@ -288,7 +288,7 @@ def processTriangularBandMatrixArg(wType, n):
 def processPackedMatrixArg(wType, n):
   processArrayArg('AP', 'PackedTriangle', wType.valueType, '', ['AP_size'], True)
 
-def initCall(name, returnType, typedName, args):
+def initCall(name, returnType, args):
   call = '  '
   if 'out' in args:
     call += '*out = '
@@ -296,7 +296,6 @@ def initCall(name, returnType, typedName, args):
     call += 'return '
   if name == 'amax':
     call += '*n > 0 ? '
-  call += typedName
   return call
 
 def endCall(args, name):
@@ -355,7 +354,7 @@ def genSwitchValue(args, mc, isComplex):
       i += 1
   return s
 
-def genSwitchCase(mCase, aCase, isComplex, callBeg, callEnd):
+def genSwitchCase(mCase, aCase, isComplex, callee, callBeg, callEnd):
   i = 1;
   caseNumber = 0
   for n in mCase:
@@ -375,7 +374,8 @@ def genSwitchCase(mCase, aCase, isComplex, callBeg, callEnd):
       caseNumber += i
     i = 2*i
   out = '  case ' + str(caseNumber) + ':\n  '
-  out += callBeg  + getCaseSuffix(mCase, aCase) + callEnd
+  out += '  SHOW_PENCIL_FUNCTION("' + callee + '");\n'
+  out += '  ' + callBeg  + callee + callEnd
   return out + '    break;\n'
 
 def getCaseSuffix(mc, ac):
@@ -522,7 +522,7 @@ def genWrapper(name, wType, level, args, mCases):
   aCases = getArrayCases(args)
   decl = ''
   pencilFuncName = 'pencil_' + wType.name
-  callBeg = initCall(name, wType.returnType, pencilFuncName, args)
+  callBeg = initCall(name, wType.returnType, args)
   callEnd = endCall(pencilCallArgs, name)
   body += '  switch(' + genSwitchValue(args, mCases, wType.isComplex) + ') {\n'
   for mc in mCases:
@@ -532,7 +532,7 @@ def genWrapper(name, wType, level, args, mCases):
       arglist = ', '.join(pencilArgs)
       decl += fReturnType + ' ' + pencilFuncName + getCaseSuffix(mc, ac)
       decl += '(' + substituteSizes(name, arglist, ac, mc) + ');\n'
-      body += genSwitchCase(mc, ac, wType.isComplex, callBeg, callEnd)
+      body += genSwitchCase(mc, ac, wType.isComplex, pencilFuncName + getCaseSuffix(mc, ac), callBeg, callEnd)
   body += '  default:\n'
   body += '    fprintf(stderr, "Invalid case for ' + name + '");\n'
   body += '    exit(1);\n'

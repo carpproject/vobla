@@ -35,6 +35,13 @@
 #define CONJ      2
 #define CONJTRANS 3
 
+#ifdef SHOW_CALLED_PENCIL_FUNCTIONS
+  #include <stdio.h>
+  #define SHOW_PENCIL_FUNCTION(x) {fprintf(stdout, "PENCIL function: %s\n", (x));}
+#else
+  #define SHOW_PENCIL_FUNCTION(x)
+#endif
+
 typedef struct ComplexFloat {
   float Re;
   float Im;
