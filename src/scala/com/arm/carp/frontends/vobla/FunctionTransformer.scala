@@ -47,7 +47,7 @@ private class FunctionTransformer(
 
   private def createFunctionForIntrinsic(name: String, stype: Pencil.ScalarType, nargs: Int) = {
     val params = for (_ <- 1 to nargs) yield Pencil.ScalarVariableDef(stype, "param", None)
-    new Pencil.Function(name, params, None, stype, None, false, false, false)
+    new Pencil.Function(name, params, None, stype, None, false, false, false, false)
   }
 
   private def toPencilCallInt(vname: String) = {
@@ -1138,6 +1138,6 @@ private class FunctionTransformer(
       case t: Vobla.ScalarType => transformScalarType(t)
       case t => ice(t, "Invalid return type")
     }
-    new Pencil.Function(name, args, None, returnType, None, false, local, false)
+    new Pencil.Function(name, args, None, returnType, None, false, local, false, false)
   }
 }
