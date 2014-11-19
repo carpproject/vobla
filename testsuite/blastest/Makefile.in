@@ -24,7 +24,7 @@
 FC=gfortran
 CC=gcc
 VC=../../vobla
-VOO=${PENCIL_OPTIMIZER}
+VOO=@PENCIL_OPTIMIZER@ --include ../pencil.h
 
 FFLAGS=-m32 -ff2c -g
 CFLAGS=-Wall -Wno-unknown-pragmas -m32 -std=c99 -g -I testfiles -include "testfiles/builtin.h"

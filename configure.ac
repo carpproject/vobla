@@ -119,4 +119,5 @@ PATH=$OLDPATH
 AC_CONFIG_FILES([vobla], [chmod +x vobla])
 AC_CONFIG_FILES([global-vobla], [chmod +x global-vobla])
 AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([testsuite/blastest/Makefile])
 AC_OUTPUT
