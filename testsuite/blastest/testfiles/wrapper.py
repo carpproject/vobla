@@ -45,6 +45,7 @@ functions = (
    ['dotu',  'cz',   'void', 1, ['out', 'n', 'X', 'Y']],
    ['nrm2',  'sdcz', 'real', 1, ['n', 'X']],
    ['rot',   'sd',   'void', 1, ['n', 'X', 'Y', 'c', 's']],
+   ['rotm',  'sd',   'void', 1, ['n', 'X', 'Y', 'PARAM']],
    ['scal',  'sdcz', 'void', 1, ['n', 'alpha', 'X']],
    ['sscal', 'c',    'void', 1, ['n', 'alpha', 'X']],
    ['dscal', 'z',    'void', 1, ['n', 'alpha', 'X']],
@@ -185,6 +186,12 @@ class WrapperType:
 #####    C Wrapper      #####
 #############################
 
+def gen1DArraySizeDeclFromView(arrayName):
+  if options.flatten:
+    return '[restrict const static ' + arrayName + '_view__storage__base_size0]'
+  else:
+    return '[restrict const static ' + arrayName + '_view.storage.base_size0]'
+
 def gen2DArraySizeDeclFromView(arrayName):
   if options.flatten:
     return '[restrict const static ' + arrayName + '_view__storage__base_size0][' + arrayName + '_view__storage__base_size1]'
@@ -221,6 +228,8 @@ def processArrayArg(name, dim, vType, arg2, arraySize, isConst):
     pencilCallArgs.append('*' + arg2 + name)
   if not arraySize:
     pencilArgs.append(vType + ' ' + name + '[1]')
+  elif len(arraySize) == 1 and dim == 'Fixed':
+    pencilArgs.append(vType + ' ' + name + '[restrict const static ' + arraySize[0] + ']')
   elif len(arraySize) == 1 and dim == 'Vector':
     pencilArgs.append(vType + ' ' + name + '[restrict const static ' + arraySize[0] + '][1]')
   else:
@@ -229,7 +238,8 @@ def processArrayArg(name, dim, vType, arg2, arraySize, isConst):
   viewName = 'one_view' if arraySize == '1' else name + '_view'
   # Generate arguments to VOBLA function
   if options.flatten:
-    flatArgs = {'Vector':         ['storage__base_size0', 'storage__base_size1', 'view_size0', 'offset0', 'offset1'], \
+    flatArgs = {'Fixed':          ['storage__base_size0', 'view_size0', 'offset0'], \
+                'Vector':         ['storage__base_size0', 'storage__base_size1', 'view_size0', 'offset0', 'offset1'], \
                 'Matrix':         ['storage__base_size0', 'storage__base_size1', 'view_size0', 'view_size1', 'offset0', 'offset1'], \
                 'Triangle':       ['storage__base_size0', 'storage__base_size1', 'n', 'offset0', 'offset1'], \
                 'BandMatrix':     ['storage__base_size0', 'storage__base_size1', 'm', 'n', 'kl', 'ku'], \
@@ -241,12 +251,14 @@ def processArrayArg(name, dim, vType, arg2, arraySize, isConst):
     # Storage
     if dim == 'PackedTriangle':
       voblaCallArgs.append(viewName + '.storage.n')
+    elif dim == 'Fixed':
+      voblaCallArgs.append(viewName + '.storage.base_size0')
     else:
       voblaCallArgs.append(viewName + '.storage.base_size0')
       voblaCallArgs.append(viewName + '.storage.base_size1')
 
     # View, offset, etc.
-    nonStorageStart = 1 if dim == 'PackedTriangle' else 2
+    nonStorageStart = 1 if dim in ['PackedTriangle', 'Fixed'] else 2
     for a in flatArgs[dim][nonStorageStart:]:
       voblaCallArgs.append(viewName + '.' + a)
 
@@ -256,6 +268,8 @@ def processArrayArg(name, dim, vType, arg2, arraySize, isConst):
   optionalConst = 'const' if isConst == True else ''
   if dim == 'PackedTriangle':
     voblaArgs.append(optionalConst + ' ' + vType + ' ' + name + '[1]')
+  elif dim == 'Fixed':
+    voblaArgs.append(vType + ' ' + name + gen1DArraySizeDeclFromView(name))
   else:
     voblaArgs.append(optionalConst + ' ' + vType + ' ' + name + gen2DArraySizeDeclFromView(name))
   voblaCallArgs.append(name)
@@ -446,6 +460,8 @@ def genWrapper(name, wType, level, args, mCases):
       body += processFlagArg(a, 'Diag', not 'triangular' in args, name in ['trmm', 'trsm'])
     elif a in ['m', 'n', 'k', 'kl', 'ku']:
       processWrapperArg(a, 'int', False)
+    elif a in ['PARAM']:
+      processArrayArg(a, 'Fixed', wType.valueType, '', ['5'], True)
     # Process values
     elif a in ['alpha', 'beta', 'c', 's']:
       isReal = (a == 'alpha' and name in ['herk', 'sscal', 'dscal', 'her', 'hpr']) \
@@ -606,6 +622,12 @@ struct PackedTriangularStorage {
 };
 
 // Views
+
+struct FixedView {
+  struct ArrayView storage;
+  int view_size0;
+  int offset0;
+};
 
 struct VectorView {
   struct ArrayView storage;
@@ -789,6 +811,15 @@ def getPencilPackedMatrixView():
   view += '  AP_view.offset1 = 0;\n'
   return view
 
+def getPencilFixedArrayView(name, size):
+  viewname = name + '_view'
+  view = ''
+  view += '  struct FixedView ' + viewname + ';\n'
+  view += '  ' + viewname + '.storage.base_size0 = ' + size + ';\n'
+  view += '  ' + viewname + '.view_size0 = ' + size + ';\n'
+  view += '  ' + viewname + '.offset0 = 0;\n'
+  return view
+
 def getPencilMatrixCase(name, mc, i):
   # Default: no transpose
   case = 'n'
@@ -856,6 +887,8 @@ def genPencilViews(name, level, args, mc, ac):
     elif arg in['AP']:
       views += getPencilPackedMatrixView()
       acIdx += 1
+    elif arg in ['PARAM']:
+      views += getPencilFixedArrayView('PARAM', '5')
   return views
 
 def genPencilWrapper(name, wType, level, args, mCases):

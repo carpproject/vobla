@@ -1,0 +1,87 @@
+/*
+ * Copyright (c) 2013-2014, ARM Limited
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publih, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnihed to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice hall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+// Apply modified Given's rotation H to vector X and Y
+//
+// With PARAM[0]=FLAG, H has one of the following forms.
+//
+//     FLAG=-1.0     FLAG=0.0      FLAG=1.0      FLAG=-2.0
+//
+//     (H11  H12)    (1.0  H12)    (H11  1.0)    (1.0  0.0)
+// H = (        )    (        )    (        )    (        )
+//     (H21  H22)    (H21  1.0)    (-1.0 H22)    (0.0  1.0)
+
+function rotm(out X: Real[], out Y: Real[], in PARAM: Real[5]) {
+  let flag = PARAM[0];
+
+  if (flag <= -2) {
+    return;
+  }
+
+  if (flag < 0) {
+    forall(i, Xi in X) {
+      let h11 = PARAM[1];
+      let h12 = PARAM[3];
+      let h21 = PARAM[2];
+      let h22 = PARAM[4];
+
+      let w = Xi;
+      let z = Y[i];
+      Xi   = w*h11 + z*h12;
+      Y[i] = w*h21 + z*h22;
+    }
+  }
+  else {
+    if (flag == 0) {
+      forall(i, Xi in X) {
+        let h12 = PARAM[3];
+        let h21 = PARAM[2];
+
+        let w = Xi;
+        let z = Y[i];
+        Xi   = w     + z*h12;
+        Y[i] = w*h21 + z;
+      }
+    }
+    else { // if flag > 0
+      forall(i, Xi in X) {
+        let h11 = PARAM[1];
+        let h22 = PARAM[4];
+
+        let w = Xi;
+        let z = Y[i];
+        Xi   = w*h11 + z;
+        Y[i] = -w    + z*h22;
+      }
+    }
+  }
+}
+
+export rotm<Float>(X is          Column, Y is          Column) as srotm_nn;
+export rotm<Float>(X is          Column, Y is Reversed Column) as srotm_nr;
+export rotm<Float>(X is Reversed Column, Y is          Column) as srotm_rn;
+export rotm<Float>(X is Reversed Column, Y is Reversed Column) as srotm_rr;
+
+export rotm<Double>(X is          Column, Y is          Column) as drotm_nn;
+export rotm<Double>(X is          Column, Y is Reversed Column) as drotm_nr;
+export rotm<Double>(X is Reversed Column, Y is          Column) as drotm_rn;
+export rotm<Double>(X is Reversed Column, Y is Reversed Column) as drotm_rr;

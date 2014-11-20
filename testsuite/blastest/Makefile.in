@@ -30,7 +30,7 @@ FFLAGS=-m32 -ff2c -g
 CFLAGS=-Wall -Wno-unknown-pragmas -m32 -std=c99 -g -I testfiles -include "testfiles/builtin.h"
 
 # Functions to test in vobla
-BLAS1OBJS=rotg.o rot.o swap.o scal.o copy.o axpy.o dot.o nrm2.o asum.o amax.o
+BLAS1OBJS=rotg.o rot.o rotm.o swap.o scal.o copy.o axpy.o dot.o nrm2.o asum.o amax.o
 BLAS2OBJS=gemv.o trmv.o trsv.o ger.o her.o her2.o syr.o syr2.o
 BLAS3OBJS=gemm.o syrk.o syr2k.o trmm.o trsm.o herk.o her2k.o
 
