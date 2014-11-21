@@ -34,43 +34,44 @@ function rotm(out X: Real[], out Y: Real[], in PARAM: Real[5]) {
   let flag = PARAM[0];
 
   if (flag <= -2) {
-    return;
-  }
-
-  if (flag < 0) {
-    forall(i, Xi in X) {
-      let h11 = PARAM[1];
-      let h12 = PARAM[3];
-      let h21 = PARAM[2];
-      let h22 = PARAM[4];
-
-      let w = Xi;
-      let z = Y[i];
-      Xi   = w*h11 + z*h12;
-      Y[i] = w*h21 + z*h22;
-    }
+    // Do nothing, preserve original
   }
   else {
-    if (flag == 0) {
-      forall(i, Xi in X) {
-        let h12 = PARAM[3];
-        let h21 = PARAM[2];
-
-        let w = Xi;
-        let z = Y[i];
-        Xi   = w     + z*h12;
-        Y[i] = w*h21 + z;
-      }
-    }
-    else { // if flag > 0
+    if (flag < 0) {
       forall(i, Xi in X) {
         let h11 = PARAM[1];
+        let h12 = PARAM[3];
+        let h21 = PARAM[2];
         let h22 = PARAM[4];
 
         let w = Xi;
         let z = Y[i];
-        Xi   = w*h11 + z;
-        Y[i] = -w    + z*h22;
+        Xi   = w*h11 + z*h12;
+        Y[i] = w*h21 + z*h22;
+      }
+    }
+    else {
+      if (flag == 0) {
+        forall(i, Xi in X) {
+          let h12 = PARAM[3];
+          let h21 = PARAM[2];
+
+          let w = Xi;
+          let z = Y[i];
+          Xi   = w     + z*h12;
+          Y[i] = w*h21 + z;
+        }
+      }
+      else { // if flag > 0
+        forall(i, Xi in X) {
+          let h11 = PARAM[1];
+          let h22 = PARAM[4];
+
+          let w = Xi;
+          let z = Y[i];
+          Xi   = w*h11 + z;
+          Y[i] = -w    + z*h22;
+        }
       }
     }
   }
