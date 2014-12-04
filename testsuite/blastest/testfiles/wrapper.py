@@ -891,6 +891,18 @@ def genPencilViews(name, level, args, mc, ac):
       views += getPencilFixedArrayView('PARAM', '5')
   return views
 
+def genPencilScopBody(name, voblaname, level, fReturnType, wType, args, callArgs, mc, ac):
+  pScop = ''
+  pScop += genPencilAssumes(name, args)
+  pScop += genPencilViews(name, level, args, mc, ac)
+  # Generate call to VOBLA-generated PENCIL function
+  pScop += '  '
+  if fReturnType != 'void':
+    pScop += 'return '
+  pScop += voblaname
+  pScop += '(' + ', '.join(callArgs) + ');\n'
+  return pScop
+
 def genPencilWrapper(name, wType, level, args, mCases):
   aCases = getArrayCases(args)
   prototypes = '// Prototypes of VOBLA-generated PENCIL functions\n'
@@ -911,14 +923,8 @@ def genPencilWrapper(name, wType, level, args, mCases):
       pwrappers += '(' + substituteSizes(name, arglist, ac, mc) + ') {\n'
       pwrappers += '#pragma scop\n'
       pwrappers += '  {\n'
-      pwrappers += genPencilAssumes(name, args)
-      pwrappers += genPencilViews(name, level, args, mc, ac)
-      # Generate call to VOBLA-generated PENCIL function
-      pwrappers += '  '
-      if fReturnType != 'void':
-        pwrappers += 'return '
-      pwrappers += funcname
-      pwrappers += '(' + ', '.join(voblaCallArgsMap[wType.name]) + ');\n'
+      callArgs = voblaCallArgsMap[wType.name]
+      pwrappers += genPencilScopBody(name, funcname, level, fReturnType, wType, args, callArgs, mc, ac)
       pwrappers += '  }\n'
       pwrappers += '#pragma endscop\n'
       pwrappers += '}\n'
