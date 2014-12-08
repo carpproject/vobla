@@ -227,7 +227,7 @@ def processArrayArg(name, dim, vType, arg2, arraySize, isConst):
     pencilArgs.append('int ' + arg2 + name)
     pencilCallArgs.append('*' + arg2 + name)
   if not arraySize:
-    pencilArgs.append(vType + ' ' + name + '[1]')
+    pencilArgs.append(vType + ' ' + name + '[restrict const static 1]')
   elif len(arraySize) == 1 and dim == 'Fixed':
     pencilArgs.append(vType + ' ' + name + '[restrict const static ' + arraySize[0] + ']')
   elif len(arraySize) == 1 and dim == 'Vector':
@@ -267,7 +267,7 @@ def processArrayArg(name, dim, vType, arg2, arraySize, isConst):
     voblaCallArgs.append(viewName)
   optionalConst = 'const' if isConst == True else ''
   if dim == 'PackedTriangle':
-    voblaArgs.append(optionalConst + ' ' + vType + ' ' + name + '[1]')
+    voblaArgs.append(optionalConst + ' ' + vType + ' ' + name + '[restrict const static 1]')
   elif dim == 'Fixed':
     voblaArgs.append(vType + ' ' + name + gen1DArraySizeDeclFromView(name))
   else:
