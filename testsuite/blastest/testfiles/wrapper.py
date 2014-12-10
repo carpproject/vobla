@@ -993,11 +993,19 @@ def main():
       outfile = open(f + "-wrapper.c", "w")
       outfile.write(generateIncludes())
       outfile.write(genWrappersForFunction(findFunction(f)))
+      if f in ['scal']:
+        # append (c)sscal and (z)dscal to the scal wrapper
+        outfile.write(genWrappersForFunction(findFunction('sscal')))
+        outfile.write(genWrappersForFunction(findFunction('dscal')))
       outfile.close()
       # PENCIL wrappers
       outfile = open(f + "-pwrapper.c", "w")
       outfile.write(genPencilHeader())
       outfile.write(genPencilWrappersForFunction(findFunction(f)))
+      if f in ['scal']:
+        # append (c)sscal and (z)dscal to the scal wrapper
+        outfile.write(genPencilWrappersForFunction(findFunction('sscal')))
+        outfile.write(genPencilWrappersForFunction(findFunction('dscal')))
       outfile.close()
 
 if __name__ == "__main__":
