@@ -38,6 +38,7 @@ type T: S implements I<Value> {
 function bar(out i: I<Real>): Index
 {
   i.foo() = 3;
+  return 0;
 }
 
 export bar<Float>(i is T) as bar;

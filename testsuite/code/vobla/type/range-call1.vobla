@@ -39,6 +39,7 @@ function bar(in i: I<Real>): Index
   for(k in i.foo()) {
     let x = k + 1;
   }
+  return 0;
 }
 
 export bar<Float>(i is T) as bar;
