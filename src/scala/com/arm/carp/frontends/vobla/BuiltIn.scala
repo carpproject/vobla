@@ -31,9 +31,9 @@ import com.arm.carp.{ pencil => Pencil }
 object BuiltIn {
   val functions = Map[String, (Int, String, String, String)](
     // VOBLA name -> (number of args, integer, float, double)
-    "max" -> (2, "max", "fmaxf", "fmax"),
-    "min" -> (2, "min", "fminf", "fmin"),
-    "abs" -> (1, "abs", "fabsf", "fabs"),
-    "sqrt" -> (1, "sqrt", "sqrtf", "sqrt")
+    "max" -> (2, "imax", "fmaxf", "fmaxd"),
+    "min" -> (2, "imin", "fminf", "fmind"),
+    "abs" -> (1, "iabs", "fabsf", "fabsd"),
+    "sqrt" -> (1, "sqrt", "sqrtf", "sqrtd")
   )
 }
