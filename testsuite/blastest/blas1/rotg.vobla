@@ -44,20 +44,19 @@ function rotg (out A: Real[1], out B: Real[1], out C: Real[1], out S: Real[1]) {
     S[0] = 0.0;
     A[0] = 0.0;
     B[0] = 0.0;
+  } else {
 
-    return;
+    if(a+b < 0.0) { r = -r; }
+
+    C[0] = a/r;
+    S[0] = b/r;
+    A[0] = r;
+
+    let z = 1.0;
+    if(absA > absB) { z = S[0]; }
+    else { if(C[0] != 0.0) { z = 1.0/C[0]; } }
+    B[0] = z;
   }
-
-  if(a+b < 0.0) { r = -r; }
-
-  C[0] = a/r;
-  S[0] = b/r;
-  A[0] = r;
-
-  let z = 1.0;
-  if(absA > absB) { z = S[0]; }
-  else { if(C[0] != 0.0) { z = 1.0/C[0]; } }
-  B[0] = z;
 }
 
 export rotg<Float>(A is Row, B is Row, C is Row, S is Row) as srotg;
