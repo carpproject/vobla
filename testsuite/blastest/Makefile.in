@@ -22,7 +22,7 @@
 # Employs the BLAS test suites from http://www.netlib.org/blas/.
 
 FC=gfortran
-CC=gcc
+CC=gcc --include @PENCIL_UTIL@/include/pencil.h
 VC=../../vobla
 VOO=@PENCIL_OPTIMIZER@ --include ../pencil.h
 

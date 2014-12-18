@@ -54,7 +54,7 @@ dnl pencil util dir
 AC_SUBST(PENCIL_UTIL)
 AC_ARG_WITH([pencil-util],
   [AS_HELP_STRING([--with-pencil-util=dir],[directory containing pencil-util])],
-  [PENCIL_UTIL="$with_pencil_util"],
+  [PENCIL_UTIL=`readlink -f "$with_pencil_util"]`,
   [
    AC_MSG_WARN([pencil-util directory not found, BLAS testsuite will not be run.])
    PENCIL_UTIL=""
