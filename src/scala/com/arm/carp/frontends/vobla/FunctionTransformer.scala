@@ -921,7 +921,7 @@ private class FunctionTransformer(
   // TODO : use createFor instead
   private def translateToLoop(body: Pencil.Operation, upper: Pencil.ScalarExpression, iter: Pencil.ScalarVariable) = {
     val range = new Pencil.Range(iter, IndexZero, upper, IndexOne)
-    val loop = new Pencil.ForOperation(List(new Pencil.IndependentLoop(None)), range, new Pencil.BlockOperation(List(body)))
+    val loop = new Pencil.ForOperation(List(new Pencil.IndependentLoop(List())), range, new Pencil.BlockOperation(List(body)))
     new Pencil.BlockOperation(List(loop))
   }
 
@@ -1075,7 +1075,7 @@ private class FunctionTransformer(
   }
 
   private val createForOperation = (range: Pencil.Range, body: Pencil.Operation, parallel: Boolean) => {
-    val options = if (parallel) List(new Pencil.IndependentLoop(None)) else List()
+    val options = if (parallel) List(new Pencil.IndependentLoop(List())) else List()
     new Pencil.ForOperation(options, range, new Pencil.BlockOperation(List(body)))
   }
 
