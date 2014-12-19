@@ -86,3 +86,13 @@ Running tools
 -------------
 Vobla compiler: vobla <files>
 The tool supports -h for help
+
+Known issues
+--------------
+Both VOBLA and PENCIL require each function to have exactly one return
+statement for non-void functions, or zero or one for void functions.
+The return statement must be the last statement of the function.
+
+Currently the VOBLA compiler doesn't check this, so having multiple returns
+would result in the PENCIL back-end throwing an error (instead of a nice error
+message from the front-end).
