@@ -33,35 +33,45 @@ function gemm(
   C[i][j] += alpha*Ail*B[l][j] for i, l, Ail in A.sparse, j in 0:n-1;
 }
 
-export gemm<Float>(A is                Array,                  C is Transposed) as sgemm_nnt;
-export gemm<Float>(A is                Array, B is Transposed, C is Transposed) as sgemm_ntt;
-export gemm<Float>(A is     Transposed Array,                  C is Transposed) as sgemm_tnt;
-export gemm<Float>(A is     Transposed Array, B is Transposed, C is Transposed) as sgemm_ttt;
+function gemm_dense(
+    alpha: Value,
+    in A: Value[m][k],
+    in B: Value[k][n],
+    beta: Value,
+    out C: Value[m][n]) {
+  Cij *= beta forall _, _, Cij in C.sparse;
+  C[i][j] += alpha*sum(A[i][l]*B[l][j] forall l in 0:k-1) for i in 0:m-1, j in 0:n-1;
+}
 
-export gemm<Double>(A is            Array,                  C is Transposed) as dgemm_nnt;
-export gemm<Double>(A is            Array, B is Transposed, C is Transposed) as dgemm_ntt;
-export gemm<Double>(A is Transposed Array,                  C is Transposed) as dgemm_tnt;
-export gemm<Double>(A is Transposed Array, B is Transposed, C is Transposed) as dgemm_ttt;
+export gemm_dense<Float>(A is                Array,                  C is Transposed) as sgemm_nnt;
+export gemm_dense<Float>(A is                Array, B is Transposed, C is Transposed) as sgemm_ntt;
+export gemm_dense<Float>(A is     Transposed Array,                  C is Transposed) as sgemm_tnt;
+export gemm_dense<Float>(A is     Transposed Array, B is Transposed, C is Transposed) as sgemm_ttt;
 
-export gemm<Complex Float>(A is            Array,                  C is Transposed) as cgemm_nnt;
-export gemm<Complex Float>(A is            Array, B is Transposed, C is Transposed) as cgemm_ntt;
-export gemm<Complex Float>(A is            Array, B is Conjugated, C is Transposed) as cgemm_nct;
-export gemm<Complex Float>(A is Transposed Array,                  C is Transposed) as cgemm_tnt;
-export gemm<Complex Float>(A is Transposed Array, B is Transposed, C is Transposed) as cgemm_ttt;
-export gemm<Complex Float>(A is Transposed Array, B is Conjugated, C is Transposed) as cgemm_tct;
-export gemm<Complex Float>(A is Conjugated Array,                  C is Transposed) as cgemm_cnt;
-export gemm<Complex Float>(A is Conjugated Array, B is Transposed, C is Transposed) as cgemm_ctt;
-export gemm<Complex Float>(A is Conjugated Array, B is Conjugated, C is Transposed) as cgemm_cct;
+export gemm_dense<Double>(A is            Array,                  C is Transposed) as dgemm_nnt;
+export gemm_dense<Double>(A is            Array, B is Transposed, C is Transposed) as dgemm_ntt;
+export gemm_dense<Double>(A is Transposed Array,                  C is Transposed) as dgemm_tnt;
+export gemm_dense<Double>(A is Transposed Array, B is Transposed, C is Transposed) as dgemm_ttt;
 
-export gemm<Complex Double>(A is            Array,                  C is Transposed) as zgemm_nnt;
-export gemm<Complex Double>(A is            Array, B is Transposed, C is Transposed) as zgemm_ntt;
-export gemm<Complex Double>(A is            Array, B is Conjugated, C is Transposed) as zgemm_nct;
-export gemm<Complex Double>(A is Transposed Array,                  C is Transposed) as zgemm_tnt;
-export gemm<Complex Double>(A is Transposed Array, B is Transposed, C is Transposed) as zgemm_ttt;
-export gemm<Complex Double>(A is Transposed Array, B is Conjugated, C is Transposed) as zgemm_tct;
-export gemm<Complex Double>(A is Conjugated Array,                  C is Transposed) as zgemm_cnt;
-export gemm<Complex Double>(A is Conjugated Array, B is Transposed, C is Transposed) as zgemm_ctt;
-export gemm<Complex Double>(A is Conjugated Array, B is Conjugated, C is Transposed) as zgemm_cct;
+export gemm_dense<Complex Float>(A is            Array,                  C is Transposed) as cgemm_nnt;
+export gemm_dense<Complex Float>(A is            Array, B is Transposed, C is Transposed) as cgemm_ntt;
+export gemm_dense<Complex Float>(A is            Array, B is Conjugated, C is Transposed) as cgemm_nct;
+export gemm_dense<Complex Float>(A is Transposed Array,                  C is Transposed) as cgemm_tnt;
+export gemm_dense<Complex Float>(A is Transposed Array, B is Transposed, C is Transposed) as cgemm_ttt;
+export gemm_dense<Complex Float>(A is Transposed Array, B is Conjugated, C is Transposed) as cgemm_tct;
+export gemm_dense<Complex Float>(A is Conjugated Array,                  C is Transposed) as cgemm_cnt;
+export gemm_dense<Complex Float>(A is Conjugated Array, B is Transposed, C is Transposed) as cgemm_ctt;
+export gemm_dense<Complex Float>(A is Conjugated Array, B is Conjugated, C is Transposed) as cgemm_cct;
+
+export gemm_dense<Complex Double>(A is            Array,                  C is Transposed) as zgemm_nnt;
+export gemm_dense<Complex Double>(A is            Array, B is Transposed, C is Transposed) as zgemm_ntt;
+export gemm_dense<Complex Double>(A is            Array, B is Conjugated, C is Transposed) as zgemm_nct;
+export gemm_dense<Complex Double>(A is Transposed Array,                  C is Transposed) as zgemm_tnt;
+export gemm_dense<Complex Double>(A is Transposed Array, B is Transposed, C is Transposed) as zgemm_ttt;
+export gemm_dense<Complex Double>(A is Transposed Array, B is Conjugated, C is Transposed) as zgemm_tct;
+export gemm_dense<Complex Double>(A is Conjugated Array,                  C is Transposed) as zgemm_cnt;
+export gemm_dense<Complex Double>(A is Conjugated Array, B is Transposed, C is Transposed) as zgemm_ctt;
+export gemm_dense<Complex Double>(A is Conjugated Array, B is Conjugated, C is Transposed) as zgemm_cct;
 
 export gemm<Float>(A is UpperSymmetric                                  ) as ssymm_n_u;
 export gemm<Float>(A is UpperSymmetric, B is Transposed, C is Transposed) as ssymm_t_u;

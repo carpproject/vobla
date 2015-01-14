@@ -29,49 +29,58 @@ function gemv(alpha: Value, in A: SparseIterable<Value>[m][n], in X: Value[n], b
   Y[i] += alpha*Aij*X[j] for i, j, Aij in A.sparse;
 }
 
-export gemv<Float>(A is            Array , X is          Column, Y is          Column) as sgemv_n_nn;
-export gemv<Float>(A is Transposed Array, X is          Column, Y is          Column) as sgemv_t_nn;
-export gemv<Float>(A is            Array, X is          Column, Y is Reversed Column) as sgemv_n_nr;
-export gemv<Float>(A is Transposed Array, X is          Column, Y is Reversed Column) as sgemv_t_nr;
-export gemv<Float>(A is            Array, X is Reversed Column, Y is          Column) as sgemv_n_rn;
-export gemv<Float>(A is Transposed Array, X is Reversed Column, Y is          Column) as sgemv_t_rn;
-export gemv<Float>(A is            Array, X is Reversed Column, Y is Reversed Column) as sgemv_n_rr;
-export gemv<Float>(A is Transposed Array, X is Reversed Column, Y is Reversed Column) as sgemv_t_rr;
+function gemv_dense(alpha: Value, in A: Value[m][n], in X: Value[n], beta: Value, out Y: Value[m]) {
+  Yi *= beta forall _, Yi in Y.sparse;
 
-export gemv<Double>(A is            Array, X is          Column, Y is          Column) as dgemv_n_nn;
-export gemv<Double>(A is Transposed Array, X is          Column, Y is          Column) as dgemv_t_nn;
-export gemv<Double>(A is            Array, X is          Column, Y is Reversed Column) as dgemv_n_nr;
-export gemv<Double>(A is Transposed Array, X is          Column, Y is Reversed Column) as dgemv_t_nr;
-export gemv<Double>(A is            Array, X is Reversed Column, Y is          Column) as dgemv_n_rn;
-export gemv<Double>(A is Transposed Array, X is Reversed Column, Y is          Column) as dgemv_t_rn;
-export gemv<Double>(A is            Array, X is Reversed Column, Y is Reversed Column) as dgemv_n_rr;
-export gemv<Double>(A is Transposed Array, X is Reversed Column, Y is Reversed Column) as dgemv_t_rr;
+  for (i in Y.getRange()) {
+    let y = sum(A[i][j]*Xj forall j,Xj in X.sparse);
+    Y[i] += alpha * y;
+  }
+}
 
-export gemv<Complex Float>(A is            Array, X is          Column, Y is          Column) as cgemv_n_nn;
-export gemv<Complex Float>(A is Transposed Array, X is          Column, Y is          Column) as cgemv_t_nn;
-export gemv<Complex Float>(A is Conjugated Array, X is          Column, Y is          Column) as cgemv_c_nn;
-export gemv<Complex Float>(A is            Array, X is          Column, Y is Reversed Column) as cgemv_n_nr;
-export gemv<Complex Float>(A is Transposed Array, X is          Column, Y is Reversed Column) as cgemv_t_nr;
-export gemv<Complex Float>(A is Conjugated Array, X is          Column, Y is Reversed Column) as cgemv_c_nr;
-export gemv<Complex Float>(A is            Array, X is Reversed Column, Y is          Column) as cgemv_n_rn;
-export gemv<Complex Float>(A is Transposed Array, X is Reversed Column, Y is          Column) as cgemv_t_rn;
-export gemv<Complex Float>(A is Conjugated Array, X is Reversed Column, Y is          Column) as cgemv_c_rn;
-export gemv<Complex Float>(A is            Array, X is Reversed Column, Y is Reversed Column) as cgemv_n_rr;
-export gemv<Complex Float>(A is Transposed Array, X is Reversed Column, Y is Reversed Column) as cgemv_t_rr;
-export gemv<Complex Float>(A is Conjugated Array, X is Reversed Column, Y is Reversed Column) as cgemv_c_rr;
+export gemv_dense<Float>(A is            Array , X is          Column, Y is          Column) as sgemv_n_nn;
+export gemv_dense<Float>(A is Transposed Array, X is          Column, Y is          Column) as sgemv_t_nn;
+export gemv_dense<Float>(A is            Array, X is          Column, Y is Reversed Column) as sgemv_n_nr;
+export gemv_dense<Float>(A is Transposed Array, X is          Column, Y is Reversed Column) as sgemv_t_nr;
+export gemv_dense<Float>(A is            Array, X is Reversed Column, Y is          Column) as sgemv_n_rn;
+export gemv_dense<Float>(A is Transposed Array, X is Reversed Column, Y is          Column) as sgemv_t_rn;
+export gemv_dense<Float>(A is            Array, X is Reversed Column, Y is Reversed Column) as sgemv_n_rr;
+export gemv_dense<Float>(A is Transposed Array, X is Reversed Column, Y is Reversed Column) as sgemv_t_rr;
 
-export gemv<Complex Double>(A is            Array, X is          Column, Y is          Column) as zgemv_n_nn;
-export gemv<Complex Double>(A is Transposed Array, X is          Column, Y is          Column) as zgemv_t_nn;
-export gemv<Complex Double>(A is Conjugated Array, X is          Column, Y is          Column) as zgemv_c_nn;
-export gemv<Complex Double>(A is            Array, X is          Column, Y is Reversed Column) as zgemv_n_nr;
-export gemv<Complex Double>(A is Transposed Array, X is          Column, Y is Reversed Column) as zgemv_t_nr;
-export gemv<Complex Double>(A is Conjugated Array, X is          Column, Y is Reversed Column) as zgemv_c_nr;
-export gemv<Complex Double>(A is            Array, X is Reversed Column, Y is          Column) as zgemv_n_rn;
-export gemv<Complex Double>(A is Transposed Array, X is Reversed Column, Y is          Column) as zgemv_t_rn;
-export gemv<Complex Double>(A is Conjugated Array, X is Reversed Column, Y is          Column) as zgemv_c_rn;
-export gemv<Complex Double>(A is            Array, X is Reversed Column, Y is Reversed Column) as zgemv_n_rr;
-export gemv<Complex Double>(A is Transposed Array, X is Reversed Column, Y is Reversed Column) as zgemv_t_rr;
-export gemv<Complex Double>(A is Conjugated Array, X is Reversed Column, Y is Reversed Column) as zgemv_c_rr;
+export gemv_dense<Double>(A is            Array, X is          Column, Y is          Column) as dgemv_n_nn;
+export gemv_dense<Double>(A is Transposed Array, X is          Column, Y is          Column) as dgemv_t_nn;
+export gemv_dense<Double>(A is            Array, X is          Column, Y is Reversed Column) as dgemv_n_nr;
+export gemv_dense<Double>(A is Transposed Array, X is          Column, Y is Reversed Column) as dgemv_t_nr;
+export gemv_dense<Double>(A is            Array, X is Reversed Column, Y is          Column) as dgemv_n_rn;
+export gemv_dense<Double>(A is Transposed Array, X is Reversed Column, Y is          Column) as dgemv_t_rn;
+export gemv_dense<Double>(A is            Array, X is Reversed Column, Y is Reversed Column) as dgemv_n_rr;
+export gemv_dense<Double>(A is Transposed Array, X is Reversed Column, Y is Reversed Column) as dgemv_t_rr;
+
+export gemv_dense<Complex Float>(A is            Array, X is          Column, Y is          Column) as cgemv_n_nn;
+export gemv_dense<Complex Float>(A is Transposed Array, X is          Column, Y is          Column) as cgemv_t_nn;
+export gemv_dense<Complex Float>(A is Conjugated Array, X is          Column, Y is          Column) as cgemv_c_nn;
+export gemv_dense<Complex Float>(A is            Array, X is          Column, Y is Reversed Column) as cgemv_n_nr;
+export gemv_dense<Complex Float>(A is Transposed Array, X is          Column, Y is Reversed Column) as cgemv_t_nr;
+export gemv_dense<Complex Float>(A is Conjugated Array, X is          Column, Y is Reversed Column) as cgemv_c_nr;
+export gemv_dense<Complex Float>(A is            Array, X is Reversed Column, Y is          Column) as cgemv_n_rn;
+export gemv_dense<Complex Float>(A is Transposed Array, X is Reversed Column, Y is          Column) as cgemv_t_rn;
+export gemv_dense<Complex Float>(A is Conjugated Array, X is Reversed Column, Y is          Column) as cgemv_c_rn;
+export gemv_dense<Complex Float>(A is            Array, X is Reversed Column, Y is Reversed Column) as cgemv_n_rr;
+export gemv_dense<Complex Float>(A is Transposed Array, X is Reversed Column, Y is Reversed Column) as cgemv_t_rr;
+export gemv_dense<Complex Float>(A is Conjugated Array, X is Reversed Column, Y is Reversed Column) as cgemv_c_rr;
+
+export gemv_dense<Complex Double>(A is            Array, X is          Column, Y is          Column) as zgemv_n_nn;
+export gemv_dense<Complex Double>(A is Transposed Array, X is          Column, Y is          Column) as zgemv_t_nn;
+export gemv_dense<Complex Double>(A is Conjugated Array, X is          Column, Y is          Column) as zgemv_c_nn;
+export gemv_dense<Complex Double>(A is            Array, X is          Column, Y is Reversed Column) as zgemv_n_nr;
+export gemv_dense<Complex Double>(A is Transposed Array, X is          Column, Y is Reversed Column) as zgemv_t_nr;
+export gemv_dense<Complex Double>(A is Conjugated Array, X is          Column, Y is Reversed Column) as zgemv_c_nr;
+export gemv_dense<Complex Double>(A is            Array, X is Reversed Column, Y is          Column) as zgemv_n_rn;
+export gemv_dense<Complex Double>(A is Transposed Array, X is Reversed Column, Y is          Column) as zgemv_t_rn;
+export gemv_dense<Complex Double>(A is Conjugated Array, X is Reversed Column, Y is          Column) as zgemv_c_rn;
+export gemv_dense<Complex Double>(A is            Array, X is Reversed Column, Y is Reversed Column) as zgemv_n_rr;
+export gemv_dense<Complex Double>(A is Transposed Array, X is Reversed Column, Y is Reversed Column) as zgemv_t_rr;
+export gemv_dense<Complex Double>(A is Conjugated Array, X is Reversed Column, Y is Reversed Column) as zgemv_c_rr;
 
 export gemv<Float>(A is      BandMatrix, X is          Column, Y is          Column) as sgbmv_n_nn;
 export gemv<Float>(A is      BandMatrix, X is          Column, Y is Reversed Column) as sgbmv_n_nr;
