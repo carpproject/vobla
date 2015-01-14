@@ -738,7 +738,7 @@ def genPencilVectorView(arg, case, size):
   view = ''
   view += '  struct VectorView ' + viewname + ';\n'
   view += '  ' + viewname + '.storage.base_size0 = ' + size + ';\n'
-  view += '  ' + viewname + '.storage.base_size1 = abs(inc' + arg + ');\n'
+  view += '  ' + viewname + '.storage.base_size1 = iabs(inc' + arg + ');\n'
   view += '  ' + viewname + '.view_size0 = ' + size + ';\n'
   view += '  ' + viewname + '.offset0 = ' + \
           ('0' if case == 'n' else size + ' - 1') + \
