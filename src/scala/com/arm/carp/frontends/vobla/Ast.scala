@@ -186,7 +186,7 @@ private object Ast extends Common with Assertable {
     case (DIV_MOV, List(lValue, rValue, Suffix(par, iters, _))) => For(iters, List(MovDiv(lValue, rValue, t)), par, t)
     case (MINUS_MOV, List(lValue, rValue, Suffix(par, iters, _))) => For(iters, List(MovMinus(lValue, rValue, t)), par, t)
     case (VAR_DECL, List(name: Name, GenericAst(scalarType: Vobla.ScalarType, _))) => VarDecl(name, scalarType, List(), t)
-    case (ARRAY_TYPE, GenericAst(base: Vobla.ScalarType, _)::dims) => ArrayType(base, dims, t)
+    case (ARRAY_TYPE, GenericAst(base: Vobla.ScalarType, _)::dims) => ArrayType(base.setAssignable(true), dims, t)
     case (VAR_DECL, List(name: Name, ArrayType(scalarType, dims, _))) => VarDecl(name, scalarType, dims, t)
     case (VAR_DECL, List(name: Name, typeOfBase)) => TypeOfDecl(name, typeOfBase, false, t)
     case (VAR_DECL_ASSIGN, List(name: Name, exp)) => TypeOfDecl(name, exp, true, t)
